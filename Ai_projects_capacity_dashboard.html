@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Keehan Services — Technical Documentation v2.1</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* === VARIABLES === */
+:root{
+  --navy:#0f2545;--blue:#1a4fad;--blue-mid:#2563eb;--blue-light:#dbeafe;
+  --blue-pale:#f0f6ff;--accent:#f97316;--accent-light:#fff7ed;
+  --green:#166534;--green-light:#dcfce7;--red:#991b1b;--red-light:#fee2e2;
+  --amber:#92400e;--amber-light:#fef3c7;--purple:#5b21b6;--purple-light:#ede9fe;
+  --gray1:#f8fafc;--gray2:#e2e8f0;--gray3:#94a3b8;--gray4:#475569;--gray5:#1e293b;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--gray1);color:var(--gray5);min-height:100vh}
+
+/* === TAB RADIO SYSTEM — ALL PANELS HIDDEN BY DEFAULT === */
+.kr   { display:none }
+.slab { display:none }
+
+#r-overview:checked   ~ .shell > .tnav > label[for=r-overview]   { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-current:checked    ~ .shell > .tnav > label[for=r-current]    { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-newprocess:checked ~ .shell > .tnav > label[for=r-newprocess] { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-workflows:checked  ~ .shell > .tnav > label[for=r-workflows]  { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-tools:checked      ~ .shell > .tnav > label[for=r-tools]      { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-tariffs:checked    ~ .shell > .tnav > label[for=r-tariffs]    { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-files:checked      ~ .shell > .tnav > label[for=r-files]      { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-credentials:checked~ .shell > .tnav > label[for=r-credentials]{ color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-questions:checked  ~ .shell > .tnav > label[for=r-questions]  { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-risks:checked      ~ .shell > .tnav > label[for=r-risks]      { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-timeline:checked   ~ .shell > .tnav > label[for=r-timeline]   { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-map:checked        ~ .shell > .tnav > label[for=r-map]        { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+#r-notes:checked      ~ .shell > .tnav > label[for=r-notes]      { color:#fff; border-bottom-color:#f97316; font-weight:600 }
+
+#r-overview:checked   ~ .shell > .panes > #s-overview   { display:block }
+#r-current:checked    ~ .shell > .panes > #s-current    { display:block }
+#r-newprocess:checked ~ .shell > .panes > #s-newprocess { display:block }
+#r-workflows:checked  ~ .shell > .panes > #s-workflows  { display:block }
+#r-tools:checked      ~ .shell > .panes > #s-tools      { display:block }
+#r-tariffs:checked    ~ .shell > .panes > #s-tariffs    { display:block }
+#r-files:checked      ~ .shell > .panes > #s-files      { display:block }
+#r-credentials:checked~ .shell > .panes > #s-credentials{ display:block }
+#r-questions:checked  ~ .shell > .panes > #s-questions  { display:block }
+#r-risks:checked      ~ .shell > .panes > #s-risks      { display:block }
+#r-timeline:checked   ~ .shell > .panes > #s-timeline   { display:block }
+#r-map:checked        ~ .shell > .panes > #s-map        { display:block }
+#r-notes:checked      ~ .shell > .panes > #s-notes      { display:block }
+
+
+/* === LAYOUT === */
+.hdr{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.08)}
+.hdr-title{display:flex;align-items:center;gap:14px}
+.badge{background:var(--accent);color:#fff;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;padding:4px 10px;border-radius:3px;text-transform:uppercase}
+.hdr-name{color:#fff;font-size:17px;font-weight:600}
+.hdr-sub{color:rgba(255,255,255,.45);font-size:12px;font-family:var(--mono)}
+.save-btn{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:6px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
+.save-btn:hover{background:#ea6c0a}
+.save-status{font-size:12px;font-family:var(--mono);color:#4ade80;opacity:0;transition:opacity .3s;margin-right:10px}
+.save-status.visible{opacity:1}
+.shell{display:block}
+.tnav{background:var(--navy);padding:0 28px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;position:sticky;top:72px;z-index:99}
+.tnav::-webkit-scrollbar{display:none}
+.tnav label{background:none;cursor:pointer;color:rgba(255,255,255,.45);font-family:var(--sans);font-size:12.5px;font-weight:500;padding:11px 16px;white-space:nowrap;border-bottom:2.5px solid transparent;display:inline-block;transition:color .15s,border-color .15s}
+.tnav label:hover{color:rgba(255,255,255,.75)}
+.panes{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
+
+/* === COMPONENTS === */
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:14px;border-bottom:2px solid var(--gray2)}
+.section-icon{width:36px;height:36px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.section-title{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.02em}
+.section-desc{font-size:13px;color:var(--gray3);font-family:var(--mono);margin-top:2px}
+.card{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:20px 24px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue-mid);margin-bottom:12px;font-family:var(--mono)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.chip{display:inline-block;font-size:11px;font-family:var(--mono);font-weight:500;padding:3px 9px;border-radius:4px;margin:2px}
+.chip-blue{background:var(--blue-light);color:var(--blue)}
+.chip-red{background:var(--red-light);color:var(--red)}
+.chip-green{background:var(--green-light);color:var(--green)}
+.chip-amber{background:var(--amber-light);color:var(--amber)}
+.chip-purple{background:var(--purple-light);color:var(--purple)}
+.callout{border-radius:8px;padding:14px 18px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.callout-body{font-size:13px;line-height:1.6}
+.callout-title{font-weight:700;margin-bottom:3px}
+.callout.info{background:var(--blue-pale);border:1px solid #bfdbfe;color:var(--blue)}
+.callout.warn{background:var(--amber-light);border:1px solid #fcd34d;color:var(--amber)}
+.callout.risk{background:var(--red-light);border:1px solid #fca5a5;color:var(--red)}
+.callout.success{background:var(--green-light);border:1px solid #86efac;color:var(--green)}
+.callout.purple{background:var(--purple-light);border:1px solid #c4b5fd;color:var(--purple)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--navy);color:#fff;font-weight:600;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left}
+td{padding:10px 14px;border-bottom:1px solid var(--gray2);color:var(--gray5);vertical-align:top}
+tr:nth-child(even) td{background:var(--gray1)}
+tr:hover td{background:var(--blue-pale)}
+.table-wrap{background:#fff;border:1px solid var(--gray2);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.qa-block{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:20px 24px;margin-bottom:14px}
+.qa-question{font-size:13.5px;font-weight:600;color:var(--navy);margin-bottom:4px;display:flex;align-items:flex-start;gap:8px}
+.qa-num{font-family:var(--mono);font-size:11px;border-radius:4px;padding:2px 7px;flex-shrink:0;margin-top:1px}
+.qa-num.open{background:var(--amber-light);color:var(--amber)}
+.qa-num.info{background:var(--blue-light);color:var(--blue)}
+.qa-num.done{background:var(--green-light);color:var(--green)}
+.qa-context{font-size:12px;color:var(--gray3);font-style:italic;margin-bottom:8px;padding-left:36px}
+.qa-answer{width:100%;padding:10px 14px;border:1.5px solid var(--gray2);border-radius:6px;font-family:var(--sans);font-size:13px;color:var(--gray5);background:var(--gray1);resize:vertical;min-height:60px;transition:border-color .15s;outline:none}
+.qa-answer:focus{border-color:var(--blue-mid);background:#fff}
+.qa-answer.answered{border-color:var(--green);background:#f0fdf4}
+.status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--mono);font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.status::before{content:'●';font-size:8px}
+.status-done{background:var(--green-light);color:var(--green)}
+.status-pending{background:var(--amber-light);color:var(--amber)}
+.status-blocked{background:var(--red-light);color:var(--red)}
+.status-unknown{background:var(--purple-light);color:var(--purple)}
+.new-tag{display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-family:var(--mono);font-weight:700;padding:2px 7px;border-radius:3px;margin-left:8px;vertical-align:middle;text-transform:uppercase;letter-spacing:.05em}
+.divider{height:1px;background:var(--gray2);margin:20px 0}
+.mono{font-family:var(--mono)}
+.cost-card{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:20px;text-align:center}
+.cost-card.feat{border-color:var(--blue-mid);box-shadow:0 0 0 3px var(--blue-light)}
+.cost-amt{font-size:32px;font-weight:700;color:var(--navy);font-family:var(--mono)}
+.cost-period{font-size:12px;color:var(--gray3)}
+.cost-name{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--blue-mid)}
+.prog-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:8px;margin-bottom:6px;background:#fff;border:1px solid var(--gray2)}
+.prog-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.pi-done{background:var(--green-light)}
+.pi-pend{background:var(--amber-light)}
+.pi-block{background:var(--red-light)}
+.prog-text{flex:1;font-size:13.5px;font-weight:500}
+.prog-owner{font-size:11px;font-family:var(--mono);color:var(--gray3)}
+.path-hdr{border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.path-a{background:linear-gradient(135deg,#ede9fe,#ddd6fe);border:2px solid #7c3aed}
+.path-b{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:2px solid #2563eb}
+.vflow{background:#fff;border-radius:10px;padding:28px;margin-bottom:16px}
+.vrow{display:flex;align-items:stretch}
+.vconn{width:40px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.vline{width:2px;flex:1;min-height:20px}
+.vline-b{background:var(--blue-mid)}
+.vline-p{background:#7c3aed}
+.vdot{width:28px;height:28px;border-radius:50%;color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin:4px 0}
+.vd-b{background:var(--blue-mid)}
+.vd-p{background:#7c3aed}
+.vd-a{background:#f59e0b}
+.vcontent{flex:1;padding:8px 0 20px 16px}
+.vbox{border-radius:8px;padding:14px 18px;border-left:4px solid}
+.vb-intake{border-color:#6366f1;background:#f5f3ff}
+.vb-koncile{border-color:#7c3aed;background:#faf5ff}
+.vb-check{border-color:#f59e0b;background:#fffbeb}
+.vb-n8n{border-color:#3b82f6;background:#eff6ff}
+.vb-out{border-color:#06b6d4;background:#ecfeff}
+.vb-deliver{border-color:#8b5cf6;background:#faf5ff}
+.vb-manual{border-color:#f97316;background:#fff7ed}
+.vb-sp{border-color:#10b981;background:#f0fdf4}
+.vbox-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.vbox-sub{font-size:12.5px;color:var(--gray4);line-height:1.5}
+.vbox-tools{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.vbox-note{margin-top:8px;font-size:11.5px;color:var(--gray3);font-style:italic}
+.flow-wrap{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:28px;margin-bottom:16px;overflow-x:auto}
+.flow-row{display:flex;align-items:flex-start;min-width:860px;gap:0}
+.flow-step{flex:1;position:relative}
+.flow-step:not(:last-child)::after{content:'→';position:absolute;right:-11px;top:26px;font-size:18px;color:var(--gray3);z-index:2}
+.flow-box{margin:0 8px;border-radius:8px;padding:12px 8px;text-align:center;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.fb-sys{background:#f3f4f6;border:1.5px solid #9ca3af}
+.fb-man{background:#fef3c7;border:1.5px solid #f59e0b}
+.fb-pain{background:#fee2e2;border:1.5px dashed #ef4444}
+.fb-auto{background:#dbeafe;border:1.5px solid #3b82f6}
+.fb-out{background:#dcfce7;border:1.5px solid #22c55e}
+.fn{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gray3)}
+.fl{font-size:11.5px;font-weight:600;color:var(--gray5);line-height:1.3}
+.fs{font-size:10px;color:var(--gray4);font-family:var(--mono);line-height:1.3}
+.flow-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--gray2)}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray4)}
+.leg-dot{width:12px;height:12px;border-radius:3px;border:1.5px solid}
+/* Jessica notes toggle — credentials panel only */
+.jnt{display:none}
+.jnl{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;font-weight:700;color:#92400e;font-family:var(--mono);background:#fef3c7;border:1px solid #fcd34d;padding:3px 10px;border-radius:20px;margin-top:12px;user-select:none}
+.jnl:hover{background:#fde68a}
+.jnb{display:none;margin-top:8px;background:#fffbeb;border:1px solid #fcd34d;border-left:3px solid #f59e0b;border-radius:6px;padding:12px 14px;font-size:12.5px;color:#78350f;line-height:1.65}
+.jnt:checked ~ .jnb{display:block}
+.jnt:checked ~ .jnl{background:#fde68a}
+.jar{transition:transform .15s;display:inline-block}
+.jnt:checked + .jnl .jar{transform:rotate(90deg)}
+@media(max-width:768px){.two-col,.three-col{grid-template-columns:1fr}.panes{padding:20px 16px}}
+</style>
+</head>
+<body>
+
+<input type="radio" name="kt" id="r-overview" class="kr"  checked>
+<input type="radio" name="kt" id="r-current" class="kr">
+<input type="radio" name="kt" id="r-newprocess" class="kr">
+<input type="radio" name="kt" id="r-workflows" class="kr">
+<input type="radio" name="kt" id="r-tools" class="kr">
+<input type="radio" name="kt" id="r-tariffs" class="kr">
+<input type="radio" name="kt" id="r-files" class="kr">
+<input type="radio" name="kt" id="r-credentials" class="kr">
+<input type="radio" name="kt" id="r-questions" class="kr">
+<input type="radio" name="kt" id="r-risks" class="kr">
+<input type="radio" name="kt" id="r-timeline" class="kr">
+<input type="radio" name="kt" id="r-map" class="kr">
+<input type="radio" name="kt" id="r-notes" class="kr">
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-title">
+      <span class="badge">v2.1</span>
+      <div>
+        <div class="hdr-name">Keehan Services — PO Reconciliation Automation</div>
+        <div class="hdr-sub">Plus 1 Technology · Updated Mar 27, 2026 · Koncile Advanced + n8n Cloud · keehnservice.app.n8n.cloud</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center">
+      <span class="save-status" id="saveStatus">✓ Saved</span>
+      <button class="save-btn" onclick="saveAll()">💾 Save Notes</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="tnav"><label for="r-overview">📋 Overview</label><label for="r-current">⚙️ Current Process</label><label for="r-newprocess">🚀 New Process</label><label for="r-workflows">🔀 Both Workflow Paths</label><label for="r-tools">🛠 Tools &amp; Stack</label><label for="r-tariffs">💰 Tariffs &amp; Freight</label><label for="r-files">📁 Files &amp; Naming</label><label for="r-credentials">🔐 Credentials</label><label for="r-questions">❓ Open Questions</label><label for="r-risks">⚠️ Risks</label><label for="r-timeline">📅 Timeline</label><label for="r-map">🗺️ Process Map</label><label for="r-notes">📝 My Notes</label></div>
+  <div class="panes">
+<div id="s-overview" class="slab">
+<div class="section-header"><div class="section-icon">📋</div><div><div class="section-title">Project Overview <span class="new-tag">v2</span></div><div class="section-desc">Key facts, stakeholders, decisions, constraints</div></div></div>
+
+  <div class="callout success"><div class="callout-icon">🎯</div><div class="callout-body"><div class="callout-title">The Goal</div>Automate PO ↔ packing slip reconciliation for Keehan Services. Koncile Advanced extracts both documents via API. n8n reconciles and builds a clean PDF report emailed to Nicole for manual Vision entry. ~$245/month. ~100 POs/week. 14–16 month payback.</div></div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">👥 Stakeholders</div>
+      <table style="margin:0"><tr><td style="font-weight:600;width:130px">Steve Kovacic</td><td>Owner / Decision Maker</td></tr><tr><td style="font-weight:600">Nicole Kovacic</td><td>Office Manager · End User · Manual Vision entry</td></tr><tr><td style="font-weight:600">Foreman (Jeff)</td><td>Warehouse · Will scan packing slips</td></tr><tr><td style="font-weight:600">Jessica Peaden</td><td>Plus 1 · AI Implementation Lead</td></tr><tr><td style="font-weight:600">Mike Ciano</td><td>Plus 1 · Technical Support</td></tr><tr><td style="font-weight:600">Lisa Street</td><td>PLUSS Corp · Vision ERP Support</td></tr></table>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Volume & Credits <span class="new-tag">Updated</span></div>
+      <div class="three-col" style="gap:10px;margin-bottom:12px">
+        <div style="text-align:center;padding:10px;background:var(--blue-pale);border-radius:8px"><div style="font-size:24px;font-weight:700;color:var(--navy);font-family:var(--mono)">5–30</div><div style="font-size:11px;color:var(--gray3)">slips/day</div></div>
+        <div style="text-align:center;padding:10px;background:var(--blue-pale);border-radius:8px"><div style="font-size:24px;font-weight:700;color:var(--navy);font-family:var(--mono)">~100</div><div style="font-size:11px;color:var(--gray3)">POs/week</div></div>
+        <div style="text-align:center;padding:10px;background:var(--blue-pale);border-radius:8px"><div style="font-size:24px;font-weight:700;color:var(--navy);font-family:var(--mono)">400</div><div style="font-size:11px;color:var(--gray3)">credits/mo</div></div>
+      </div>
+      <div style="padding:10px;background:var(--green-light);border-radius:6px;font-size:12px;color:var(--green)"><strong>Credit math:</strong> ~100 pairs × 4 credits (2-pg slip + 2-pg PO) = 400/mo. Well within 1,000 credit allocation. Overage: €0.25/page.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✅ Confirmed Decisions <span class="new-tag">Updated</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--green);font-size:16px">✅</span><span><strong>Plan:</strong> Koncile Advanced €199/mo — full API required for structured JSON output into n8n</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--green);font-size:16px">✅</span><span><strong>Total cost:</strong> ~$245/mo (€199 Koncile + ~$30 n8n infrastructure)</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--green);font-size:16px">✅</span><span><strong>Output:</strong> PDF report emailed to Nicole via Outlook — she manually enters into Vision</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--green);font-size:16px">✅</span><span><strong>Intake:</strong> OneDrive monitored folder — warehouse scans packing slip → PDF uploaded</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--green);font-size:16px">✅</span><span><strong>Vision stays manual:</strong> No API, no integration possible. Nicole's entry is a hard requirement.</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--green);font-size:16px">✅</span><span><strong>Two workflow paths designed:</strong> Path A (Koncile private endpoint) and Path B (n8n delta logic) — both fully built out</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:#7c3aed;font-size:16px">⏳</span><span><strong>Path A vs B:</strong> Awaiting Koncile email response on private reconciliation endpoint availability</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span style="color:#7c3aed;font-size:16px">⏳</span><span><strong>File format:</strong> Confirm with Nicole — PDF only or also JPG/PNG from scanner</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏢 Vision ERP Constraint (Hard Wall)</div>
+    <span class="chip chip-red">No API</span><span class="chip chip-red">No CSV Import</span><span class="chip chip-red">No Integrations</span><span class="chip chip-red">No Custom Dev</span><span class="chip chip-red">No Roadmap</span>
+    <div style="font-size:13px;color:var(--gray4);margin-top:10px;line-height:1.6">PTM-Vision by PLUSS Corporation (since 2017). "Can barely talk to itself in program" — Nicole. Manual entry is a permanent constraint unless Keehan replaces the ERP entirely.</div>
+  </div>
+</div>
+<div id="s-current" class="slab">
+<div class="section-header"><div class="section-icon">⚙️</div><div><div class="section-title">Current Process (As-Is)</div><div class="section-desc">Fully manual, fully physical — no digital tracking anywhere</div></div></div>
+
+  <div class="callout warn"><div class="callout-icon">⚠️</div><div class="callout-body"><div class="callout-title">The Core Problem</div>~100 POs/week at 1–5 min each. Physical scanning of annotated POs back into SharePoint is the biggest single time drain. No digital partial/backorder tracking. Two copies of every PO created as a side-effect of the paper workflow.</div></div>
+
+  <div class="flow-wrap">
+    <div class="flow-title">🔴 As-Is Process Flow</div>
+    <div style="overflow-x:auto">
+      <div class="flow-row">
+        <div class="flow-step"><div class="flow-box fb-sys"><div class="fn">01</div><div class="fl">Create PO</div><div class="fs">In Vision</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-sys"><div class="fn">02</div><div class="fl">Export PDF</div><div class="fs">PO# in filename</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-man"><div class="fn">03</div><div class="fl">Email Vendor</div><div class="fs">+ Print physical</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-man"><div class="fn">04</div><div class="fl">Pin to Board</div><div class="fs">Warehouse board</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-pain"><div class="fn">05</div><div class="fl">Shipment Arrives</div><div class="fs">Loose check "looks all here"</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-pain"><div class="fn">06</div><div class="fl">Nicole Reconciles</div><div class="fs">Manual line-by-line</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-man"><div class="fn">07</div><div class="fl">Enter Vision</div><div class="fs">Manual key-in</div></div></div>
+        <div class="flow-step"><div class="flow-box fb-pain"><div class="fn">08</div><div class="fl">Scan PO Back</div><div class="fs">Markup → SharePoint (DUPLICATE)</div></div></div>
+      </div>
+    </div>
+    <div class="flow-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#f3f4f6;border-color:#9ca3af"></div>System</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#fef3c7;border-color:#f59e0b"></div>Manual</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#fee2e2;border-color:#ef4444;border-style:dashed"></div>Pain Point</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🔴 Nicole's Exact Words</div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:13px">
+        <div style="padding:8px 12px;background:var(--red-light);border-radius:6px;border-left:3px solid #ef4444">"Checking items in is probably where errors are created"</div>
+        <div style="padding:8px 12px;background:var(--red-light);border-radius:6px;border-left:3px solid #ef4444">"Not having the purchase order hard copy in the storeroom — there's another error"</div>
+        <div style="padding:8px 12px;background:var(--red-light);border-radius:6px;border-left:3px solid #ef4444">"POs get generated and sometimes not sent — that's an issue"</div>
+        <div style="padding:8px 12px;background:var(--red-light);border-radius:6px;border-left:3px solid #ef4444">"The physical scanning is what takes the longest point of everything"</div>
+        <div style="padding:8px 12px;background:var(--red-light);border-radius:6px;border-left:3px solid #ef4444">"We have two sets of POs — one blank, one with the markup"</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Step Pain Table</div>
+      <table style="margin:0;font-size:12px">
+        <tr><th>Step</th><th>Who</th><th>Pain</th></tr>
+        <tr><td>Create PO + Export PDF</td><td>Staff</td><td><span class="chip chip-green">Low</span></td></tr>
+        <tr><td>Email vendor + Print + Board</td><td>Staff</td><td><span class="chip chip-amber">Medium</span></td></tr>
+        <tr><td>Foreman physical match</td><td>Jeff</td><td><span class="chip chip-red">High — errors</span></td></tr>
+        <tr><td>Nicole reconcile line by line</td><td>Nicole</td><td><span class="chip chip-red">High — time</span></td></tr>
+        <tr><td>Enter in Vision</td><td>Nicole</td><td><span class="chip chip-amber">Medium</span></td></tr>
+        <tr><td>Scan annotated PO → SharePoint</td><td>Nicole</td><td><span class="chip chip-red">High — most time</span></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="s-newprocess" class="slab">
+<div class="section-header"><div class="section-icon">🚀</div><div><div class="section-title">New Process (To-Be) <span class="new-tag">Updated</span></div><div class="section-desc">What changes and what stays — same for Nicole regardless of Path A or B</div></div></div>
+
+  <div class="two-col mb20">
+    <div class="card" style="border-color:#ef4444">
+      <div class="card-title" style="color:#ef4444">🔴 BEFORE</div>
+      <ol style="padding-left:20px;font-size:13px;line-height:2.2">
+        <li>PO created in Vision</li><li>Printed + emailed to vendor</li><li>Physical copy on warehouse board</li><li>Shipment arrives — loose check</li>
+        <li style="color:#ef4444;font-weight:600">Nicole manually compares line by line</li>
+        <li style="color:#ef4444;font-weight:600">Keys into Vision manually</li>
+        <li style="color:#ef4444;font-weight:600">Scans PO back → duplicate created</li>
+        <li>Partials: paper back to storeroom</li>
+      </ol>
+    </div>
+    <div class="card" style="border-color:#22c55e">
+      <div class="card-title" style="color:var(--green)">🟢 AFTER</div>
+      <ol style="padding-left:20px;font-size:13px;line-height:2.2">
+        <li>PO created in Vision</li><li>PDF saved to SharePoint (standard naming)</li><li>Emailed to vendor</li><li>Shipment arrives — foreman scans slip to OneDrive</li>
+        <li style="color:var(--green);font-weight:600">Koncile + n8n auto-reconcile</li>
+        <li style="color:var(--green);font-weight:600">Nicole gets PDF report via email</li>
+        <li style="color:var(--green);font-weight:600">Nicole enters Vision from clean report</li>
+        <li>Partials: flagged digitally in report</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="callout purple"><div class="callout-icon">🔀</div><div class="callout-body"><div class="callout-title">Path A vs Path B — Same Output for Nicole</div>The PDF report Nicole receives is identical regardless of which technical path is used. Path A (Koncile private endpoint) is leaner on n8n side. Path B (n8n does delta logic) is confirmed available today. See Workflow Paths tab for full node-by-node detail on both.</div></div>
+
+  <div class="card">
+    <div class="card-title">📄 Report Columns — Nicole Confirmed</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <span class="chip chip-blue">Part Number</span><span class="chip chip-blue">Ordered Qty</span><span class="chip chip-blue">Received Qty</span><span class="chip chip-blue">Qty Outstanding</span><span class="chip chip-blue">Invoice Price</span><span class="chip chip-blue">PO Price</span><span class="chip chip-blue">Variance $</span><span class="chip chip-blue">Job # / Work Order</span><span class="chip chip-blue">Tariff Total (KSCTARF)</span><span class="chip chip-amber">Discrepancy Flag</span><span class="chip chip-amber">Partial / Backorder</span><span class="chip chip-amber">Substitute Part Flag</span>
+    </div>
+    <div style="font-size:12px;color:var(--gray4);font-style:italic">"Just show what the invoice price is versus what the part received. Invoice price versus the part shipped. They reconcile out and you put them in." — Nicole</div>
+  </div>
+</div>
+<div id="s-workflows" class="slab">
+<div class="section-header"><div class="section-icon">🔀</div><div><div class="section-title">Both Workflow Paths <span class="new-tag">New</span></div><div class="section-desc">Path A = Koncile private endpoint (6 nodes) · Path B = n8n delta logic (9 nodes)</div></div></div>
+
+  <div class="callout warn"><div class="callout-icon">📧</div><div class="callout-body"><div class="callout-title">Awaiting Koncile Response</div>Email sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="43202c2d3722203703282c2d202a2f266d222a">[email&#160;protected]</a> asking whether Advanced plan API includes cross-document reconciliation endpoint. Their answer determines which path to build. Both are fully designed and ready.</div></div>
+
+  <!-- ─── PATH A ──────────────────────────────────────────────────────────── -->
+  <div class="path-hdr path-a">
+    <div style="font-size:28px">🟣</div>
+    <div style="flex:1">
+      <div class="path-title" style="color:#5b21b6">PATH A — Koncile Private Reconciliation Endpoint</div>
+      <div class="path-sub">IF Koncile confirms API cross-document reconciliation is available on Advanced plan</div>
+    </div>
+    <div style="text-align:right"><div style="font-size:14px;font-weight:700;color:#5b21b6">6 n8n nodes</div><div style="font-size:11px;color:var(--gray4);font-family:var(--mono)">Leaner build</div></div>
+  </div>
+
+  <div class="vflow" style="border:1px solid #7c3aed">
+    <div class="flow-title" style="color:#5b21b6">🟣 Path A Workflow — Node by Node</div>
+    <div style="font-size:12px;color:var(--gray4);margin-bottom:20px">Koncile handles extraction AND line matching. n8n formats and delivers. Still computes backorders/tariffs/variances itself.</div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-p">1</div><div class="vline vline-p"></div></div><div class="vcontent"><div class="vbox vb-intake"><div class="vbox-title">📥 OneDrive Trigger + PDF Filter</div><div class="vbox-sub">n8n watches OneDrive intake folder. New file detected → IF Node filters PDFs only → extracts PO# from filename. Non-PDF files logged and ignored.</div><div class="vbox-tools"><span class="chip chip-blue">OneDrive Trigger</span><span class="chip chip-blue">IF Node (PDF filter)</span></div><div class="vbox-note">⚠️ OPEN: Confirm with Nicole — PDF only or also JPG/PNG from scanner output</div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-p">2</div><div class="vline vline-p"></div></div><div class="vcontent"><div class="vbox vb-koncile"><div class="vbox-title">📤 Upload Both Documents to Koncile (Two API Calls)</div><div class="vbox-sub"><strong>Call 1:</strong> POST packing slip PDF → receive <span class="mono">document_id_PS</span><br><strong>Call 2:</strong> Fetch matching PO PDF from SharePoint using extracted PO# → POST to Koncile → receive <span class="mono">document_id_PO</span><br>Poll both until status = DONE. Error if PO not found in SharePoint → email Nicole.</div><div class="vbox-tools"><span class="chip chip-purple">POST /v1/upload_file (×2)</span><span class="chip chip-blue">SharePoint Node</span><span class="chip chip-purple">Poll status</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-p">3</div><div class="vline vline-p"></div></div><div class="vcontent"><div class="vbox vb-koncile"><div class="vbox-title">🔗 Trigger Koncile Reconciliation (Private Endpoint)</div><div class="vbox-sub">POST both document IDs to Koncile's private reconciliation endpoint:<br><span class="mono" style="font-size:11px">{ "po_document_id": "xxx", "packing_slip_document_id": "yyy" }</span><br>Receive <span class="mono">reconciliation_job_id</span> → poll until complete → fetch result.<br>Result includes: po_json, packing_slip_json, line_matches array with match scores per line.</div><div class="vbox-tools"><span class="chip chip-purple">Private Reconcile Endpoint</span><span class="chip chip-purple">Poll until complete</span><span class="chip chip-purple">GET result JSON</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-a">?</div><div class="vline vline-p"></div></div><div class="vcontent"><div class="vbox vb-check"><div class="vbox-title">🔍 Confidence Check + Error Routing</div><div class="vbox-sub">Low confidence on any field → email Nicole with original PDFs for manual review. High confidence → continue. PO not found path also routes here.</div><div class="vbox-tools"><span class="chip chip-amber">Switch Node</span><span class="chip chip-amber">Outlook flag email</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-p">4</div><div class="vline vline-p"></div></div><div class="vcontent"><div class="vbox vb-n8n"><div class="vbox-title">🧮 Compute Business Logic in n8n (Still Required)</div><div class="vbox-sub">Koncile's line_matches JSON gives you matched/unmatched pairs and match scores. n8n still computes:<br>• <strong>Backorder qty</strong> = ordered − received (where delta &gt; 0)<br>• <strong>Price variance</strong> $ and %<br>• <strong>Tariff lines</strong> summed per job_reference → map to KSCTARF part number<br>• <strong>Substitute part flag</strong> = description mismatch on matched line<br>• <strong>Unmatched PO lines</strong> = items ordered but not on packing slip → backorder</div><div class="vbox-tools"><span class="chip chip-blue">Code Node (JS)</span><span class="chip chip-blue">Set Node</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-p">5</div><div class="vline vline-p"></div></div><div class="vcontent"><div class="vbox vb-out"><div class="vbox-title">📄 Generate PDF Report</div><div class="vbox-sub">Format reconciled data into Nicole's template. All columns: Part #, Ordered, Received, Outstanding, PO Price, Invoice Price, Variance, Job, Tariff, Flags. Summary at top.</div><div class="vbox-tools"><span class="chip chip-blue">HTML→PDF Node</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-p">6</div></div><div class="vcontent"><div class="vbox vb-deliver"><div class="vbox-title">📧 Email PDF to Nicole via Outlook</div><div class="vbox-sub">Subject: "Reconciled PO [PO#] — [X] items, [Y] variances, [Z] tariffs". PDF attached. Discrepancy summary in body.</div><div class="vbox-tools"><span class="chip chip-blue">Outlook Node</span></div></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ─── PATH B ──────────────────────────────────────────────────────────── -->
+  <div class="path-hdr path-b">
+    <div style="font-size:28px">🔵</div>
+    <div style="flex:1">
+      <div class="path-title" style="color:var(--blue-mid)">PATH B — n8n Handles All Delta Logic (Fallback)</div>
+      <div class="path-sub">IF Koncile reconciliation endpoint is UI-only — confirmed fully buildable with public API today</div>
+    </div>
+    <div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--blue-mid)">9 n8n nodes</div><div style="font-size:11px;color:var(--gray4);font-family:var(--mono)">More logic, still clean</div></div>
+  </div>
+
+  <div class="vflow" style="border:1px solid var(--blue-mid)">
+    <div class="flow-title">🔵 Path B Workflow — Node by Node</div>
+    <div style="font-size:12px;color:var(--gray4);margin-bottom:20px">Koncile extracts each document separately via API. n8n does all line matching, delta calculation, and business logic before generating the report.</div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">1</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-intake"><div class="vbox-title">📥 OneDrive Trigger + PDF Filter</div><div class="vbox-sub">Same as Path A. n8n watches OneDrive intake folder. IF Node filters PDFs. Parse PO# from filename.</div><div class="vbox-tools"><span class="chip chip-blue">OneDrive Trigger</span><span class="chip chip-blue">IF Node</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">2</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-koncile" style="border-color:var(--blue-mid);background:#eff6ff"><div class="vbox-title">🧠 Extract Packing Slip — Koncile API</div><div class="vbox-sub">Upload packing slip PDF. Poll until DONE. Fetch JSON: General_fields (PO#, vendor, date) + Line_fields array [{part_number, qty_received, price, description}] with confidence scores per field. Handles handwritten notes, check marks, "partial" annotations.</div><div class="vbox-tools"><span class="chip chip-blue">POST /v1/upload_file</span><span class="chip chip-blue">GET /v1/fetch_document_data</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-a">?</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-check"><div class="vbox-title">🔍 Confidence Check — Packing Slip</div><div class="vbox-sub">If confidence &lt; threshold on PO#, part numbers, or quantities → email Nicole with original PDF for manual review. High confidence → continue to PO fetch.</div><div class="vbox-tools"><span class="chip chip-amber">Switch Node</span><span class="chip chip-amber">Outlook flag email</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">3</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-sp"><div class="vbox-title">📂 Fetch Matching PO from SharePoint</div><div class="vbox-sub">Use extracted PO# to search SharePoint Purchase Orders folder by filename. Download matching PO PDF. If PO not found → error email to Nicole with packing slip attached.</div><div class="vbox-tools"><span class="chip chip-blue">SharePoint/OneDrive Node</span><span class="chip chip-amber">Error: Outlook to Nicole</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">4</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-koncile" style="border-color:var(--blue-mid);background:#eff6ff"><div class="vbox-title">🧠 Extract PO — Koncile API</div><div class="vbox-sub">Upload PO PDF to Koncile. Poll until DONE. Fetch JSON: Line_fields array [{part_number, qty_ordered, unit_price, job_reference}] with confidence scores.</div><div class="vbox-tools"><span class="chip chip-blue">POST /v1/upload_file</span><span class="chip chip-blue">GET /v1/fetch_document_data</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">5</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-n8n"><div class="vbox-title">🧮 Full Reconciliation + Delta Logic in n8n</div><div class="vbox-sub">Merge both Line_fields arrays. Match by <strong>part_number</strong> (exact first, fuzzy fallback on description). Compute per line:<br>• <strong>Backorder</strong> = PO line qty − received qty where delta &gt; 0<br>• <strong>Not received</strong> = PO lines with no match on packing slip<br>• <strong>Unexpected items</strong> = packing slip lines with no PO match → flag<br>• <strong>Price variance</strong> $ and %<br>• <strong>Substitute part</strong> = part# match but description differs significantly<br>• <strong>Tariff sum per job</strong> = sum all KSCTARF lines grouped by job_reference<br>• Partial shipment status</div><div class="vbox-tools"><span class="chip chip-blue">Merge Node</span><span class="chip chip-blue">Code Node (JS delta logic)</span><span class="chip chip-blue">Set Node</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-a">?</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-check"><div class="vbox-title">🔍 Discrepancy Check — Route Report</div><div class="vbox-sub">Any variances, backorders, substitutes, or flags? → Report includes highlights. Clean receipt? → Clean report. Both paths produce a PDF and email Nicole either way.</div><div class="vbox-tools"><span class="chip chip-amber">IF Node</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">6</div><div class="vline vline-b"></div></div><div class="vcontent"><div class="vbox vb-out"><div class="vbox-title">📄 Generate PDF Report</div><div class="vbox-sub">Format reconciled array into Nicole's PDF template. All columns populated. Discrepancies highlighted. Summary section: X matched, Y variances, Z backorders, tariff total per job.</div><div class="vbox-tools"><span class="chip chip-blue">HTML→PDF Node</span></div></div></div></div>
+
+    <div class="vrow"><div class="vconn"><div class="vdot vd-b">7</div></div><div class="vcontent"><div class="vbox vb-deliver"><div class="vbox-title">📧 Email PDF to Nicole via Outlook</div><div class="vbox-sub">Subject: "Reconciled PO [PO#] — [X] items, [Y] variances, [Z] tariffs". PDF attached. Discrepancy summary in email body.</div><div class="vbox-tools"><span class="chip chip-blue">Outlook Node</span></div></div></div></div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="card">
+    <div class="card-title">⚖️ Path A vs Path B Comparison</div>
+    <div class="table-wrap" style="margin:0">
+      <table style="margin:0">
+        <tr><th>Factor</th><th>🟣 Path A (Koncile Endpoint)</th><th>🔵 Path B (n8n Delta Logic)</th></tr>
+        <tr><td><strong>n8n Nodes</strong></td><td>6</td><td>9</td></tr>
+        <tr><td><strong>Line matching engine</strong></td><td>Koncile (LLM + SKU + semantic)</td><td>n8n Code Node (exact + fuzzy fallback)</td></tr>
+        <tr><td><strong>Backorder field</strong></td><td>Compute in n8n anyway</td><td>Compute in n8n</td></tr>
+        <tr><td><strong>Tariff summing</strong></td><td>Compute in n8n</td><td>Compute in n8n</td></tr>
+        <tr><td><strong>Build complexity</strong></td><td>Lower n8n logic</td><td>More Code Node logic needed</td></tr>
+        <tr><td><strong>Dependency risk</strong></td><td>Relies on Koncile private endpoint stability</td><td>All logic in n8n — you own it</td></tr>
+        <tr><td><strong>Credits consumed</strong></td><td>4 per pair (same)</td><td>4 per pair (same)</td></tr>
+        <tr><td><strong>Available now?</strong></td><td>⏳ Pending Koncile confirmation</td><td>✅ Confirmed — public API</td></tr>
+        <tr><td><strong>Nicole's experience</strong></td><td colspan="2" style="text-align:center;font-weight:600;color:var(--green)">Identical PDF report either way</td></tr>
+        <tr><td><strong>Build decision</strong></td><td>Build IF endpoint confirmed</td><td>Build IF endpoint is UI-only</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="qa-block">
+    <div class="qa-question"><span class="qa-num open">AWAITING</span> Koncile response — Path A or B?</div>
+    <div class="qa-context">Email sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0d6e6263796c6e794d6662636e646168236c64">[email&#160;protected]</a>. Paste their response here to lock the build path.</div>
+    <textarea class="qa-answer" data-key="koncile_response" placeholder="Paste Koncile's response here..." style="min-height:100px"></textarea>
+  </div>
+</div>
+<div id="s-tools" class="slab">
+<div class="section-header"><div class="section-icon">🛠️</div><div><div class="section-title">Tools & Technology Stack <span class="new-tag">Updated</span></div><div class="section-desc">Every tool, why chosen, what was rejected</div></div></div>
+
+  <div class="three-col">
+    <div class="cost-card feat">
+      <div class="cost-name">Koncile Advanced <span class="new-tag">Upgraded</span></div>
+      <div class="cost-amt">€199</div>
+      <div class="cost-period">/month · 1,000 page credits</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--gray4);line-height:1.6">Full API · Structured JSON · PO + delivery note templates · ~250 pairs/mo capacity · €0.25/pg overage</div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-name">n8n (self-hosted)</div>
+      <div class="cost-amt">~$30</div>
+      <div class="cost-period">/month · Infrastructure</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--gray4);line-height:1.6">Workflow automation. OneDrive → Koncile → logic → PDF → Outlook. AI assist for self-service changes by Nicole.</div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-name">Total Monthly</div>
+      <div class="cost-amt">~$245</div>
+      <div class="cost-period">/month all-in</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--gray4);line-height:1.6">~5 hrs/week saved · 14–16 mo payback · Phase 2: layer carries over if Keehan changes ERP</div>
+    </div>
+  </div>
+
+  <div class="callout info" style="margin-top:16px"><div class="callout-icon">💡</div><div class="callout-body"><div class="callout-title">Why Advanced over Starter (€129)?</div>Starter has NO API access. You're stuck with manual UI exports — can't pull structured JSON into n8n. Advanced unlocks full API, dedicated PO + packing slip templates, structured JSON with confidence scores per line item, and potentially the private reconciliation endpoint.</div></div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Tool</th><th>Role</th><th>Key Reason</th><th>Status</th></tr>
+      <tr><td><strong>Koncile Advanced</strong></td><td>OCR extraction + possibly reconciliation</td><td>Full API · 98% handwritten accuracy · Zero training · Dedicated PO + packing slip templates</td><td><span class="status status-pending">Pending Setup</span></td></tr>
+      <tr><td><strong>n8n (self-hosted)</strong></td><td>Workflow + delta logic</td><td>Data privacy · Native M365/Outlook nodes · AI assist for Nicole to self-maintain</td><td><span class="status status-pending">Pending Setup</span></td></tr>
+      <tr><td><strong>OneDrive</strong></td><td>Packing slip intake folder</td><td>Already M365 · Native n8n integration</td><td><span class="status status-done">Active — org pending</span></td></tr>
+      <tr><td><strong>SharePoint</strong></td><td>PO PDF storage</td><td>Nicole's existing workflow</td><td><span class="status status-done">Active</span></td></tr>
+      <tr><td><strong>Outlook</strong></td><td>Report delivery to Nicole</td><td>Already in use · Native n8n node</td><td><span class="status status-done">Active</span></td></tr>
+      <tr><td><strong>Desktop Scanner</strong></td><td>Warehouse capture</td><td>Single receiving desk · B&W only needed</td><td><span class="status status-blocked">Not Purchased</span></td></tr>
+      <tr><td><strong>Vision ERP</strong></td><td>System of record — manual entry only</td><td>No integration possible. Nicole keys from PDF report.</td><td><span class="status status-done">Active (manual)</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">❌ Rejected Options</div>
+    <div class="table-wrap" style="margin:0"><table style="margin:0">
+      <tr><th>Option</th><th>Why Rejected</th></tr>
+      <tr><td><strong>Koncile Starter €129</strong></td><td>No API → can't pull structured JSON into n8n programmatically</td></tr>
+      <tr><td><strong>Klippa + Make.com</strong></td><td>Required Vision API which confirmed doesn't exist</td></tr>
+      <tr><td><strong>API Auto-Receive (Scenario 3)</strong></td><td>Vision has zero API. Eliminated after Lisa Street call.</td></tr>
+      <tr><td><strong>Nanonets</strong></td><td>Requires per-vendor training samples. Koncile zero-training fits better for varied formats.</td></tr>
+      <tr><td><strong>Power Automate Desktop / RPA</strong></td><td>UI automation against Vision — brittle, 15–20% annual maintenance, high failure risk</td></tr>
+    </table></div>
+  </div>
+</div>
+<div id="s-tariffs" class="slab">
+<div class="section-header"><div class="section-icon">💰</div><div><div class="section-title">Tariff & Freight Handling</div><div class="section-desc">Business rules for extraction, mapping, and reporting</div></div></div>
+
+  <div class="callout info"><div class="callout-icon">ℹ️</div><div class="callout-body"><div class="callout-title">Key Rule</div>Tariffs and freight passed through to customers at no markup as separate invoice line items. They use dedicated Vision part numbers and separate GL accounts. <strong>Never merge tariff and freight into one part number.</strong></div></div>
+
+  <div class="two-col">
+    <div class="card"><div class="card-title">🏷️ Tariff Rules</div><div style="font-size:13px;line-height:1.9"><div><strong>Part Number:</strong> <span class="mono" style="background:var(--blue-light);padding:2px 8px;border-radius:4px">KSCTARF</span> <span class="chip chip-amber">⏳ Confirm</span></div><div><strong>GL Account:</strong> Separate from freight</div><div><strong>Report:</strong> Sum all lines per job — no line-by-line breakdown needed</div><div><strong>Customer invoice:</strong> One line, no markup</div><div><strong>Phase 1 exclusion:</strong> Vendor with tariff on every line is excluded</div></div></div>
+    <div class="card"><div class="card-title">🚚 Freight Rules</div><div style="font-size:13px;line-height:1.9"><div><strong>Part Number:</strong> Different from tariff <span class="chip chip-amber">⏳ Confirm</span></div><div><strong>GL Account:</strong> Different GL from tariff</div><div><strong>Treatment:</strong> On job, passed through at no markup</div><div><strong>⚠️ Critical:</strong> Freight ≠ Tariff. Never merge.</div></div></div>
+  </div>
+
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">OPEN</span> Confirm exact tariff part number</div><textarea class="qa-answer" data-key="tariff_partnum" placeholder="Confirmed: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">OPEN</span> Confirm freight part number</div><textarea class="qa-answer" data-key="freight_partnum" placeholder="Confirmed: "></textarea></div>
+</div>
+<div id="s-files" class="slab">
+<div class="section-header"><div class="section-icon">📁</div><div><div class="section-title">Files & Naming Setup</div><div class="section-desc">Folder structure, naming standards, Koncile training data</div></div></div>
+
+  <div class="callout warn"><div class="callout-icon">⚠️</div><div class="callout-body"><div class="callout-title">Not Yet Standardized — Automation Depends on This</div>Multiple people still saving POs differently. n8n finds PO files by matching the PO# extracted from the packing slip to SharePoint filenames. Inconsistent naming = failed lookups.</div></div>
+
+  <div class="two-col">
+    <div class="card"><div class="card-title">📂 Target Folder Structure</div><div style="font-family:var(--mono);font-size:12px;background:var(--gray1);padding:16px;border-radius:6px;line-height:2.2;border:1px solid var(--gray2)">SharePoint/<br>&nbsp;&nbsp;└─ Purchase Orders/<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 2026/<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ RMI-001234-2026.pdf<br><br>OneDrive/ <span style="color:var(--accent)">← NEW</span><br>&nbsp;&nbsp;└─ Packing-Slips-Intake/ <span style="color:var(--accent)">← n8n monitors</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ RMI-001234-PackSlip.pdf<br>&nbsp;&nbsp;└─ Processed/ <span style="color:var(--accent)">← after reconcile</span></div></div>
+    <div class="card"><div class="card-title">🏷️ Naming Convention</div><div style="font-size:13px;line-height:1.9"><strong>Target:</strong> <span class="mono" style="background:var(--blue-light);padding:2px 8px;border-radius:4px">[VendorName]-[PO#]-[YYYY]</span><br><strong>Example:</strong> <span class="mono" style="background:var(--blue-light);padding:2px 8px;border-radius:4px">RMI-001234-2026.pdf</span><br><strong>Status:</strong> <span class="status status-pending">Nicole to define + distribute</span></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚠️ OPEN: Packing Slip File Format <span class="new-tag">New Question</span></div>
+    <div style="font-size:13px;color:var(--gray4);margin-bottom:10px;line-height:1.6">Nicole confirmed no scanner exists yet. Mike raised mobile camera option (produces JPG/PNG). Confirm on next call:</div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
+      <div style="padding:8px 12px;background:var(--amber-light);border-radius:6px">1. Will scanner output PDF specifically or also JPG/PNG?</div>
+      <div style="padding:8px 12px;background:var(--amber-light);border-radius:6px">2. Do any vendors email packing slips digitally? What format — PDF, Excel, image?</div>
+      <div style="padding:8px 12px;background:var(--amber-light);border-radius:6px">3. Any packing slips arriving via a route other than physically with the shipment?</div>
+    </div>
+    <textarea class="qa-answer" data-key="file_format" placeholder="Nicole's answers..."></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📚 Koncile Training Data Needed from Nicole</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="prog-item"><div class="prog-icon pi-pend">📊</div><div class="prog-text">Excel invoice tracking template</div><span class="status status-pending">Requested</span></div>
+      <div class="prog-item"><div class="prog-icon pi-pend">📄</div><div class="prog-text">Marked-up PO samples with handwritten check marks, partial/backorder notations</div><span class="status status-pending">Requested</span></div>
+      <div class="prog-item"><div class="prog-icon pi-pend">📦</div><div class="prog-text">Wide variety of packing slip samples (multiple vendors)</div><span class="status status-pending">Requested</span></div>
+      <div class="prog-item"><div class="prog-icon pi-pend">📝</div><div class="prog-text">Keyword list: "partial", "back order", "0", "1", check marks, substitute indicators</div><span class="status status-pending">Requested</span></div>
+      <div class="prog-item"><div class="prog-icon pi-pend">🏷️</div><div class="prog-text">Confirmed tariff part number and freight part number</div><span class="status status-pending">Requested</span></div>
+    </div>
+  </div>
+</div>
+<div id="s-credentials" class="slab">
+<div class="section-header"><div class="section-icon">🔐</div><div><div class="section-title">Access &amp; Credentials Setup <span class="new-tag">Comprehensive</span></div><div class="section-desc">Every platform, every credential, every step — for the setup call with Nicole</div></div></div>
+
+  <div class="callout warn"><div class="callout-icon">📞</div><div class="callout-body"><div class="callout-title">How This Call Works</div>Jessica runs the call. Nicole (and whoever has IT access) follows along and completes setup steps live. Jessica is added as admin/API user on every platform. Estimated call time: 60–90 min. Schedule via email after Koncile responds.</div></div>
+
+  <!-- ─── MASTER STATUS TABLE ─────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">📊 Master Credentials Checklist <span class="new-tag">Updated 03/27</span></div>
+    <div class="table-wrap" style="margin:0"><table style="margin:0;font-size:12.5px">
+      <tr><th>#</th><th>Platform</th><th>Who Creates Account</th><th>What Jessica Needs</th><th>When</th><th>Status</th></tr>
+      <tr><td>1</td><td><strong>Koncile Advanced</strong></td><td>Keehan (Nicole) ✅ Done</td><td>Admin access + API Key</td><td>03/27 call ✅</td><td><span class="status status-pending">Awaiting admin seat</span></td></tr>
+      <tr><td>2</td><td><strong>n8n Cloud</strong></td><td>Keehan (Nicole) ✅ Done</td><td>Accept invite + admin role</td><td>03/27 call ✅</td><td><span class="status status-pending">Invite pending accept</span></td></tr>
+      <tr><td>3</td><td><strong>Microsoft 365 / Azure AD</strong></td><td>Plus 1 internal (has backend access)</td><td>App registration + Client ID + Secret</td><td>Jessica to handle internally</td><td><span class="status status-pending">Jessica to do</span></td></tr>
+      <tr><td>4</td><td><strong>SharePoint — Intake Folder</strong></td><td>Nicole ✅ Created 03/27</td><td>Folder path + n8n credential connected</td><td>03/27 call ✅</td><td><span class="status status-pending">Credential issues on call</span></td></tr>
+      <tr><td>5</td><td><strong>SharePoint — PO Folder</strong></td><td>Already exists (Keehan)</td><td>Exact folder path + n8n read access</td><td>Confirm path</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>6</td><td><strong>Outlook (Nicole's email)</strong></td><td>Keehan (Nicole)</td><td>OAuth2 connected in n8n</td><td>03/27 — partial</td><td><span class="status status-pending">Connected w/ issues</span></td></tr>
+      <tr><td>7</td><td><strong>Nicole's email address</strong></td><td>n/a</td><td>Confirmed: always Nicole's address</td><td>03/27 ✅</td><td><span class="status status-done">Confirmed</span></td></tr>
+      <tr><td>8</td><td><strong>Error alert email</strong></td><td>n/a</td><td>Same as Nicole confirmed</td><td>03/27 ✅</td><td><span class="status status-done">Confirmed</span></td></tr>
+    </table></div>
+      <tr><th>#</th><th>Platform</th><th>Who Creates Account</th><th>What Jessica Needs</th><th>When</th><th>Status</th></tr>
+      <tr><td>1</td><td><strong>Koncile Advanced</strong></td><td>Keehan (Nicole)</td><td>Admin access + API Key</td><td>Setup call</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>2</td><td><strong>n8n (self-hosted)</strong></td><td>Plus 1 (Jessica)</td><td>Full owner access — Jessica sets up</td><td>Before setup call</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>3</td><td><strong>Microsoft 365 / Azure AD</strong></td><td>Keehan (Nicole or IT)</td><td>App registration for OAuth2 + Client ID + Secret</td><td>Setup call</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>4</td><td><strong>OneDrive — Intake Folder</strong></td><td>Keehan (Nicole)</td><td>Folder created + n8n service account read/write access</td><td>Setup call</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>5</td><td><strong>SharePoint — PO Folder</strong></td><td>Already exists (Keehan)</td><td>Exact folder path + n8n read access confirmed</td><td>Setup call</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>6</td><td><strong>Outlook (Nicole's email)</strong></td><td>Keehan (Nicole)</td><td>OAuth2 send-as permission for n8n automation</td><td>Setup call</td><td><span class="status status-pending">Pending</span></td></tr>
+      <tr><td>7</td><td><strong>Nicole's email address</strong></td><td>n/a</td><td>Exact email for report delivery — confirm spelling</td><td>Setup call</td><td><span class="status status-pending">Confirm</span></td></tr>
+      <tr><td>8</td><td><strong>Error alert email</strong></td><td>n/a</td><td>Which email receives low-confidence / error alerts</td><td>Setup call</td><td><span class="status status-pending">Confirm</span></td></tr>
+    </table></div>
+  
+
+  <!-- CALL SUMMARY 03/27 -->
+  <div class="card" style="border-left:4px solid var(--accent);margin-top:16px;background:#fffbf5">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="font-size:22px">📞</div>
+      <div><div style="font-size:15px;font-weight:700;color:var(--navy)">03/27/2026 Setup Call — What Was Done &amp; What Broke</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">Attendees: Jessica Peaden, Nicole Kovacic (+ Steve joined briefly)</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--green);font-family:var(--mono);margin-bottom:8px">✅ COMPLETED ON THIS CALL</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>Koncile Advanced</strong> account created + $229/mo plan (1,000 pages) activated by Nicole</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>n8n Cloud</strong> set up at <span class="mono" style="background:#dcfce7;padding:1px 5px;border-radius:3px">keehnservice.app.n8n.cloud</span> — Nicole created the account, invited Jessica (<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="91fbe1f4f0f5f4ffd1e1fde4e2a0e5f4f2f9fffefdfef6e8bff2fefc">[email&#160;protected]</a>)</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>Microsoft Outlook OAuth2</strong> credential connected in n8n — had to use "Microsoft OAuth 2 API" first, then Outlook credential. Added "admin" to name, Jessica added as shared user</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>SharePoint folders created:</strong> "packing slips intake" and "packing slips processed" — Nicole created inside SharePoint, shared with Jessica</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>SharePoint confirmed as sole platform</strong> — OneDrive dropped entirely. Nicole: "We use SharePoint just for everything. Nothing on our OneDrive."</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>Koncile password</strong> shared verbally — stored in saved notes below. Jessica can log in as Nicole until admin seat is available</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>Email confirmed</strong> — all reports always go to Nicole's address only</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>Plus 1 Azure backend access confirmed</strong> — Nicole: "Yep" when asked. Jessica to handle Azure app registration internally, no need to involve Keehan</span></div>
+          <div style="display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✅</span><span><strong>Scanner proposal assigned</strong> — Mike and Mark to send proposal on scanner options and capabilities</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);font-family:var(--mono);margin-bottom:8px">🔴 ISSUES ENCOUNTERED / STILL OPEN</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>Teams screen sharing grayed out</strong> — Nicole's screen share options were grayed out. Jessica resolved by changing meeting settings. <em>Not a recurring issue.</em></span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>SharePoint OAuth2 credential wouldn't connect</strong> — Scope field issue. Tried Microsoft SharePoint credential, fell back to Microsoft OAuth 2 API. Scope string was sent in chat but exact string not confirmed working. <strong>Needs to be retested.</strong></span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>n8n admin role blocked</strong> — "Plan lacks license for this feature" when trying to upgrade Jessica to admin. Likely because trial limitations OR Jessica hadn't accepted invite yet. <strong>Accept invite first, then retry.</strong></span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>Koncile admin seat unavailable during trial</strong> — Couldn't add Jessica as admin while trial is active. Workaround: Jessica uses Nicole's credentials. <strong>Upgrade admin seat after trial ends.</strong></span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>Koncile email in French</strong> — One of the emails from Koncile after plan upgrade appeared to be in French. Nicole to forward. May be the API endpoint documentation. <strong>Awaiting Nicole to forward email.</strong></span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>Jessica's browser multi-session issue</strong> — Logged into Koncile on 3 browser instances (max). Had to clear history to consolidate. <strong>Clear browser sessions before next Koncile config work.</strong></span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--red-light);border-radius:5px"><span style="color:var(--red);flex-shrink:0">⚠️</span><span><strong>Keehan SharePoint extra security (MFA)</strong> — Jessica received security code prompts when accessing Keehan's SharePoint. Extra security layer is set at the company level. Normal — not a problem, just means extra auth step each time.</span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--amber-light);border-radius:5px"><span style="color:var(--amber);flex-shrink:0">⏳</span><span><strong>Header authorization</strong> — Jessica noted this is needed but has to be done after Azure credentials are obtained. Not attempted on this call.</span></div>
+          <div style="display:flex;gap:8px;padding:6px 10px;background:var(--amber-light);border-radius:5px"><span style="color:var(--amber);flex-shrink:0">⏳</span><span><strong>Reconciliation API endpoint</strong> — Only available on Advanced plan. Endpoint protected / not publicly searchable. Possibly in French documentation. Nicole to forward any developer docs received from Koncile.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--navy);border-radius:8px;padding:14px 16px;margin-top:4px">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:10px">🔜 IMMEDIATE NEXT ACTIONS (from this call)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px">
+        <div style="color:white;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Accept n8n invite at keehnservice.app.n8n.cloud</div>
+        <div style="color:white;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Retry SharePoint OAuth2 credential with correct scope string</div>
+        <div style="color:white;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Go into Plus 1 Azure backend → register Keehan-n8n-Automation app</div>
+        <div style="color:white;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Clear browser sessions before Koncile config work</div>
+        <div style="color:white;display:flex;gap=6px"><span style="color:var(--accent)">→</span> Follow up with Mike + Mark on scanner proposal</div>
+        <div style="color:white;display:flex;gap:6px"><span style="color:var(--accent)">→</span> Wait for Nicole to forward Koncile developer docs (possibly French)</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── PLATFORM CARDS ───────────────────────────────────────────── -->
+
+  <!-- 1. KONCILE -->
+  <div class="card" style="border-left:4px solid #7c3aed;margin-top:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:20px">🧠</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">1 — Koncile Advanced</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">AI OCR extraction · $229/mo · Created 03/27 · 1,000 pages/mo plan</div></div>
+      </div>
+      <span class="status status-pending">Admin seat pending</span>
+    </div>
+    <div style="background:var(--green-light);border:1px solid #86efac;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--green)">✅ <strong>Account created 03/27.</strong> Nicole set up on Advanced plan ($229/mo, 1,000 pages). Jessica using Nicole's login until admin seat is available. Koncile password shared verbally on call — record below. <strong>To do:</strong> Once trial ends, add Jessica as admin under Settings → Team.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">REMAINING STEPS</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>Go to <span class="mono" style="background:var(--purple-light);padding:1px 5px;border-radius:3px">app.koncile.ai</span> → Create account using Keehan business email</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>Select <strong>Advanced plan</strong> (€199/mo) — do NOT select Starter</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>Go to Settings → Team → Invite <span class="mono" style="background:var(--purple-light);padding:1px 5px;border-radius:3px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bed4cedbdfdadbd0feced2cbcd8fcadbddd6d0d1d2d1d9c790ddd1d3">[email&#160;protected]</a></span> as <strong>Admin</strong></span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Go to Settings → API → Generate new API Key → copy the key</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">5</span><span>Paste key below ↓ and confirm Jessica accepted team invite</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<input type="checkbox" id="jn-koncile" class="jnote-toggle">
+<label for="jn-koncile" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body">Account is live. Using Nicole's login until admin seat is available after trial. Once trial ends: Settings → Team → add <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ddb7adb8bcb9b8b39dadb1a8aeeca9b8beb5b3b2b1b2baa4f3beb2b0">[email&#160;protected]</a> as Admin. Then generate API key. <strong>Do not generate API key before you have admin access</strong> — key needs to be scoped to your admin account, not Nicole's.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Account Email (Keehan's)</div><textarea class="qa-answer" data-key="cred_koncile_email" placeholder="nkovacic@keehanservices.com (confirmed — account owner)" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">API Key <span style="color:#991b1b;font-size:10px">(treat as password)</span></div><textarea class="qa-answer" data-key="cred_koncile_apikey" placeholder="Generate from Settings → API once admin seat active. Using Nicole login in meantime." style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Account URL / Workspace</div><textarea class="qa-answer" data-key="cred_koncile_url" placeholder="https://app.koncile.ai/workspace/..." style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. N8N -->
+  <div class="card" style="border-left:4px solid #22c55e;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:20px">⚙️</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">2 — n8n Cloud</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">n8n Cloud · <strong style="color:var(--green)">keehnservice.app.n8n.cloud</strong> · Nicole created account 03/27</div></div>
+      </div>
+      <span class="status status-done">Cloud — live</span>
+    </div>
+
+    <!-- Hosting decision -->
+    <div style="background:var(--green-light);border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">✅ CONFIRMED 03/27 — n8n Cloud at keehnservice.app.n8n.cloud</div>
+      <div style="font-size:13px;color:var(--gray4);line-height:1.7">Nicole signed up for n8n Cloud during the setup call. Workspace URL: <span class="mono" style="background:#dcfce7;padding:2px 7px;border-radius:3px">keehnservice.app.n8n.cloud</span><br>
+      Jessica invited as member at <span class="mono" style="background:#dcfce7;padding:2px 7px;border-radius:3px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="92f8e2f7f3f6f7fcd2e2fee7e1a3e6f7f1fafcfdfefdf5ebbcf1fdff">[email&#160;protected]</a></span> — <strong>invite still needs to be accepted.</strong><br>
+      Admin role upgrade was blocked by trial plan limitation. Try again after accepting invite — or wait for trial to end.</div>
+    </div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">SETUP STEPS (remaining — post call)</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#16a34a;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>✅ Done 03/27 — workspace live at keehnservice.app.n8n.cloud</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#16a34a;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>✅ Done — Nicole created owner account 03/27</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#16a34a;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>✅ Done — Jessica invited as member. <strong>Accept the invite email to activate.</strong></span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#16a34a;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Generate API key once invite accepted and admin role is set — Settings → n8n API → Generate</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#16a34a;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">5</span><span>⏳ Still to do — walk Nicole through Executions tab on next call</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">n8n Instance URL</div><textarea class="qa-answer" data-key="cred_n8n_url" placeholder="keehnservice.app.n8n.cloud" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Jessica's Owner Login</div><textarea class="qa-answer" data-key="cred_n8n_owner" placeholder="jpeaden@plus1technology.com — owner invite pending accept" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Nicole's Member Login</div><textarea class="qa-answer" data-key="cred_n8n_nicole" placeholder="nkovacic@keehanservices.com — Nicole is the account owner" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">n8n API Key (for external triggers)</div><textarea class="qa-answer" data-key="cred_n8n_apikey" placeholder="n8n_api_xxxxxxxxxxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Hosting / Server Details</div><textarea class="qa-answer" data-key="cred_n8n_vps" placeholder="Cloud: plan + workspace ID  /  VPS: provider, IP, SSH key location" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2b. HTTP HEADER CREDENTIALS -->
+  <div class="card" style="border-left:4px solid #f97316;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px">🔑</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">2b — HTTP Header Credentials (Every API Call in n8n)</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">Exact headers needed for each HTTP Request node · Reference this when building the workflow</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <!-- Koncile -->
+      <div style="background:var(--purple-light);border-radius:8px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:#5b21b6;margin-bottom:8px;display:flex;align-items:center;gap:6px">🧠 KONCILE API — All endpoints</div>
+        <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:8px;font-size:12px;font-family:var(--mono)">
+          <div style="font-weight:700;color:var(--gray4)">Header Name</div><div style="font-weight:700;color:var(--gray4)">Value</div><div style="font-weight:700;color:var(--gray4)">Where to set in n8n</div>
+          <div style="color:#5b21b6">X-API-Key</div><div style="color:var(--gray5)">{{$credentials.koncileApiKey}}</div><div style="color:var(--gray4)">Header Auth credential → "Keehan-Koncile"</div>
+          <div style="color:#5b21b6">Content-Type</div><div style="color:var(--gray5)">application/json</div><div style="color:var(--gray4)">Auto-added by n8n HTTP node</div>
+          <div style="color:#5b21b6">Accept</div><div style="color:var(--gray5)">application/json</div><div style="color:var(--gray4)">Auto-added by n8n HTTP node</div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#5b21b6;font-style:italic">Base URL: <span class="mono">https://api.koncile.ai/v1</span> · Add to every HTTP Request node that calls Koncile</div>
+      </div>
+
+      <!-- Microsoft Graph (OneDrive + SharePoint) -->
+      <div style="background:var(--blue-pale);border-radius:8px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--blue-mid);margin-bottom:8px">☁️ MICROSOFT GRAPH API — OneDrive + SharePoint nodes</div>
+        <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:8px;font-size:12px;font-family:var(--mono)">
+          <div style="font-weight:700;color:var(--gray4)">Header Name</div><div style="font-weight:700;color:var(--gray4)">Value</div><div style="font-weight:700;color:var(--gray4)">Where to set in n8n</div>
+          <div style="color:var(--blue-mid)">Authorization</div><div style="color:var(--gray5)">Bearer {{OAuth2 token}}</div><div style="color:var(--gray4)">Set automatically via Microsoft OAuth2 credential</div>
+          <div style="color:var(--blue-mid)">Content-Type</div><div style="color:var(--gray5)">application/json</div><div style="color:var(--gray4)">Auto-added</div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--blue-mid);font-style:italic">Base URL: <span class="mono">https://graph.microsoft.com/v1.0</span> · n8n Microsoft nodes handle token refresh automatically via OAuth2 credential "Keehan-M365"</div>
+        <div style="margin-top:6px;font-size:11px;color:var(--gray4)">Key Graph endpoints used: <span class="mono">/drives/{driveId}/items/{itemId}</span> (OneDrive) · <span class="mono">/sites/{siteId}/drives/{driveId}/root:/path:/children</span> (SharePoint)</div>
+      </div>
+
+      <!-- Outlook (via Graph) -->
+      <div style="background:#f0f4ff;border-radius:8px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:#0078d4;margin-bottom:8px">📧 MICROSOFT GRAPH API — Outlook / Mail.Send</div>
+        <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:8px;font-size:12px;font-family:var(--mono)">
+          <div style="font-weight:700;color:var(--gray4)">Header Name</div><div style="font-weight:700;color:var(--gray4)">Value</div><div style="font-weight:700;color:var(--gray4)">Notes</div>
+          <div style="color:#0078d4">Authorization</div><div style="color:var(--gray5)">Bearer {{OAuth2 token}}</div><div style="color:var(--gray4)">Same Keehan-M365 credential — shared with OneDrive/SharePoint</div>
+          <div style="color:#0078d4">Content-Type</div><div style="color:var(--gray5)">application/json</div><div style="color:var(--gray4)">Auto-added</div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#0078d4;font-style:italic">Endpoint: <span class="mono">POST https://graph.microsoft.com/v1.0/users/{nicole-email}/sendMail</span></div>
+        <div style="margin-top:6px;font-size:11px;color:var(--gray4)">n8n Microsoft Outlook node handles this automatically — just select "Keehan-M365" credential and it uses the correct endpoint</div>
+      </div>
+
+      <!-- OAuth2 Token Acquisition -->
+      <div style="background:var(--amber-light);border-radius:8px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:8px">🔄 HOW OAUTH2 TOKENS WORK IN n8n (No Manual Steps After Initial Setup)</div>
+        <div style="font-size:12.5px;color:var(--gray4);line-height:1.7">
+          Once you add the Microsoft 365 OAuth2 credential in n8n with the Tenant ID, Client ID, and Client Secret from step 3, n8n handles everything automatically:<br>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--gray5)">POST https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token</span><br>
+          It requests a token, stores it, attaches it as a <span class="mono" style="font-size:11px">Bearer</span> header on every API call, and refreshes it automatically when it expires. You never touch a token manually.
+        </div>
+      </div>
+
+      <!-- Koncile Upload multipart -->
+      <div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px">📎 SPECIAL CASE — Koncile File Upload (multipart/form-data)</div>
+        <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:8px;font-size:12px;font-family:var(--mono)">
+          <div style="font-weight:700;color:var(--gray4)">Header Name</div><div style="font-weight:700;color:var(--gray4)">Value</div><div style="font-weight:700;color:var(--gray4)">Notes</div>
+          <div style="color:#7c3aed">X-API-Key</div><div style="color:var(--gray5)">{{$credentials.koncileApiKey}}</div><div style="color:var(--gray4)">Same key as JSON calls</div>
+          <div style="color:#7c3aed">Content-Type</div><div style="color:var(--gray5)">multipart/form-data</div><div style="color:var(--gray4)">⚠️ Set manually — override default JSON type</div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#7c3aed">When uploading PDF files to Koncile via <span class="mono">POST /v1/upload_file</span>, the body must be <strong>multipart/form-data</strong> with the file as binary, not JSON. In n8n HTTP Request node: Body Content Type → Form-Data → add field "file" → Binary data from previous node.</div>
+      </div>
+
+    </div>
+
+    <!-- Header quick reference card -->
+    <div style="margin-top:14px;background:var(--navy);border-radius:8px;padding:16px">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:var(--mono)">QUICK REFERENCE — n8n Credential Objects to Create</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+        <div style="background:rgba(255,255,255,.08);border-radius:6px;padding:10px">
+          <div style="color:white;font-weight:700;margin-bottom:4px;font-family:var(--mono)">Keehan-Koncile</div>
+          <div style="color:rgba(255,255,255,.6);font-family:var(--mono);font-size:11px">Type: Header Auth<br>Name: X-API-Key<br>Value: [API key from Koncile settings]</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border-radius:6px;padding:10px">
+          <div style="color:white;font-weight:700;margin-bottom:4px;font-family:var(--mono)">Keehan-M365</div>
+          <div style="color:rgba(255,255,255,.6);font-family:var(--mono);font-size:11px">Type: Microsoft OAuth2<br>Tenant: [Azure tenant ID]<br>Client ID: [Azure app client ID]<br>Client Secret: [Azure secret value]<br>Scope: Files.ReadWrite.All Mail.Send Sites.ReadWrite.All</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,.4);font-family:var(--mono)">These two credential objects power every API call in the entire workflow. Set them once in n8n Settings → Credentials → both must show green ✓ before building any nodes.</div>
+    </div>
+
+  </div>
+
+  <!-- 3. MICROSOFT 365 / AZURE AD -->
+  <div class="card" style="border-left:4px solid #2563eb;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:20px">☁️</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">3 — Microsoft 365 / Azure AD App Registration</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">Needed for OneDrive + SharePoint + Outlook OAuth2 in n8n · One registration covers all three</div></div>
+      </div>
+      <span class="status status-pending">Keehan IT / Nicole</span>
+    </div>
+    <div class="callout warn" style="margin-bottom:12px"><div class="callout-icon">⚠️</div><div class="callout-body"><div class="callout-title">This is the most technical step</div>Requires access to Azure Active Directory (portal.azure.com) using Keehan's Microsoft 365 admin account. If Nicole doesn't have admin access, IT or Steve may need to do this part. Takes 10–15 min on the call.</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">SETUP STEPS</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#2563eb;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>Go to <span class="mono" style="background:var(--blue-light);padding:1px 5px;border-radius:3px">portal.azure.com</span> → Azure Active Directory → App registrations → New registration</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#2563eb;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>Name: <span class="mono" style="background:var(--blue-light);padding:1px 5px;border-radius:3px">Keehan-n8n-Automation</span> · Account type: Single tenant · No redirect URI needed</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#2563eb;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>Copy <strong>Application (client) ID</strong> and <strong>Directory (tenant) ID</strong></span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#2563eb;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Certificates &amp; secrets → New client secret → Copy the <strong>Value</strong> (only shown once!)</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#2563eb;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">5</span><span>API Permissions → Add: <span class="mono" style="background:var(--blue-light);padding:1px 5px;border-radius:3px">Files.ReadWrite.All</span> <span class="mono" style="background:var(--blue-light);padding:1px 5px;border-radius:3px">Mail.Send</span> <span class="mono" style="background:var(--blue-light);padding:1px 5px;border-radius:3px">Sites.ReadWrite.All</span> → Grant admin consent</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<input type="checkbox" id="jn-azure" class="jnote-toggle">
+<label for="jn-azure" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body"><strong>Nicole confirmed on 03/27 call that Plus 1 has Azure backend access.</strong> Handle this internally — no need to involve Nicole. Client Secret is only shown once at creation. The redirect URI must exactly match: <span class="mono">https://keehnservice.app.n8n.cloud/rest/oauth2-credential/callback</span>. Get Tenant ID and Client ID from the app overview page immediately after registration.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Tenant ID</div><textarea class="qa-answer" data-key="cred_azure_tenant" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Client ID (Application ID)</div><textarea class="qa-answer" data-key="cred_azure_client" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Client Secret <span style="color:#991b1b;font-size:10px">(only shown once — copy immediately)</span></div><textarea class="qa-answer" data-key="cred_azure_secret" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Permissions Granted?</div><textarea class="qa-answer" data-key="cred_azure_perms" placeholder="Files.ReadWrite.All ✓  Mail.Send ✓  Sites.ReadWrite.All ✓" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. SHAREPOINT INTAKE FOLDER -->
+  <div class="card" style="border-left:4px solid #0369a1;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:20px">📥</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">4 — SharePoint Intake Folders</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">OneDrive dropped — SharePoint confirmed for everything · Folders created 03/27</div></div>
+      </div>
+      <span class="status status-done">Folders created</span>
+    </div>
+
+    <div style="background:var(--green-light);border:1px solid #86efac;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--green)">
+      ✅ <strong>Completed 03/27:</strong> Nicole created both folders inside SharePoint and shared them with Jessica. OneDrive is NOT used — Nicole confirmed: <em>"We use SharePoint just for everything. Nothing on our OneDrive."</em>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">STILL TO DO</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>Confirm exact SharePoint path for both folders and record below — needed for n8n SharePoint trigger node configuration</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>Get SharePoint Site ID and Drive ID from Microsoft Graph once Azure app is registered (or grab from folder URL)</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>Configure scanner (once purchased) to save scans directly to the "packing slips intake" SharePoint folder</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Note: Keehan's SharePoint has extra MFA security — expect auth code prompts each session. This is by design.</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<input type="checkbox" id="jn-sharepoint" class="jnote-toggle">
+<label for="jn-sharepoint" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body">Both folders created 03/27. Now just need exact paths and Drive/Site IDs. Keehan has extra MFA security — expect auth code prompts each session, that's normal and by design. <strong>SharePoint credential in n8n scope:</strong> use <span class="mono">openid offline_access Sites.Read.All Sites.ReadWrite.All Files.Read.All Files.ReadWrite.All</span> — this was the issue on the 03/27 call.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Intake Folder SharePoint Path ✅ Created</div><textarea class="qa-answer" data-key="cred_sp_intake" placeholder="e.g. /sites/KeehanMain/Shared Documents/packing slips intake" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Processed Folder SharePoint Path ✅ Created</div><textarea class="qa-answer" data-key="cred_sp_processed" placeholder="e.g. /sites/KeehanMain/Shared Documents/packing slips processed" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Drive ID (get from Graph API or folder URL)</div><textarea class="qa-answer" data-key="cred_sp_driveid_intake" placeholder="b!xxxxxxxxxxxxxxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- 5. SHAREPOINT PO FOLDER -->
+  <div class="card" style="border-left:4px solid #0369a1;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:20px">📂</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">5 — SharePoint Purchase Orders Folder</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">Already exists · n8n needs read access and the exact path to look up PO PDFs by filename</div></div>
+      </div>
+      <span class="status status-pending">Confirm path</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">CONFIRM ON CALL</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>Navigate to the Purchase Orders folder in SharePoint and copy the full URL</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>Confirm the sub-folder structure: is it <span class="mono" style="background:#e0f2fe;padding:1px 5px;border-radius:3px">/Purchase-Orders/2026/</span> or flat?</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>Confirm naming of existing PO files — Jessica picks one and reads the exact filename aloud</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0369a1;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Confirm Azure app (step 3 above) has Sites.ReadWrite.All — no additional sharing needed</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<input type="checkbox" id="jn-po_folder" class="jnote-toggle">
+<label for="jn-po_folder" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body">Just need Nicole to navigate to the Purchase Orders folder while sharing screen so you can copy the URL. Site ID and Drive ID can be derived from the URL or via Graph API once Azure app is registered.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">SharePoint Site URL</div><textarea class="qa-answer" data-key="cred_sp_site" placeholder="https://keehanservices.sharepoint.com/sites/..." style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">PO Folder Path</div><textarea class="qa-answer" data-key="cred_sp_folder" placeholder="/Shared Documents/Purchase Orders/2026/" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Example PO Filename (copy one exactly)</div><textarea class="qa-answer" data-key="cred_sp_example" placeholder="e.g. RMI-001234-2026.pdf" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Site ID (from SharePoint API)</div><textarea class="qa-answer" data-key="cred_sp_siteid" placeholder="keehanservices.sharepoint.com,xxxxxxxx..." style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. OUTLOOK -->
+  <div class="card" style="border-left:4px solid #0078d4;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:20px">📧</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">6 — Outlook (Automated Email Sending)</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">n8n sends the PDF report from Nicole's email (or a shared/service email) using Mail.Send permission</div></div>
+      </div>
+      <span class="status status-pending">Confirm + configure</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">DECIDE + CONFIRM ON CALL</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0078d4;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>Decide: should emails come <em>from</em> Nicole's address or a shared service address? (e.g. <span class="mono" style="background:var(--blue-light);padding:1px 5px;border-radius:3px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="19786c6d7674786d70767759727c7c7178776a7c6b6f707a7c6a377a7674">[email&#160;protected]</a></span>)</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0078d4;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>Confirm Nicole's exact email address (report recipient) — read it aloud and confirm spelling</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0078d4;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>Confirm which email should receive error/low-confidence alerts (same as Nicole or different?)</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0078d4;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Mail.Send permission (granted in step 3 Azure AD) covers this — no additional setup needed</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#0078d4;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">5</span><span>Test: Jessica sends a test email via n8n Outlook node to Nicole's inbox to confirm it lands correctly</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<input type="checkbox" id="jn-outlook" class="jnote-toggle">
+<label for="jn-outlook" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body">Mail.Send permission via Azure app covers this. Nicole confirmed all report emails always go to her address only. Test email is the fastest end-to-end confirmation — set up Outlook node in n8n, fire manually, have Nicole confirm receipt.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Nicole's Email (report recipient) ✉️</div><textarea class="qa-answer" data-key="cred_email_nicole" placeholder="nkovacic@keehanservices.com" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Sending From (automation address)</div><textarea class="qa-answer" data-key="cred_email_from" placeholder="Nicole's own email or shared service email" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Error Alert Email</div><textarea class="qa-answer" data-key="cred_email_error" placeholder="Same as Nicole? Or Jessica's? Or both?" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Test email sent + received?</div><textarea class="qa-answer" data-key="cred_email_test" placeholder="Test sent: ___  Nicole confirmed received: ___" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. KONCILE TEMPLATES -->
+  <div class="card" style="border-left:4px solid #7c3aed;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:20px">📋</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">7 — Koncile Document Templates</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">Create extraction templates for Packing Slip and PO · Train on Nicole's sample files · Confirm field names</div></div>
+      </div>
+      <span class="status status-pending">Jessica configures</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">SETUP STEPS (after receiving Nicole's training files)</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">1</span><span>In Koncile dashboard → Templates → Create new → Select "Delivery Note / Packing Slip"</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">2</span><span>Upload Nicole's sample packing slips — add custom fields: PO#, Part Number, Qty, Unit Price, Job Ref, Tariff Line</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">3</span><span>Create second template → Select "Purchase Order" → upload sample POs → add same custom fields</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">4</span><span>Copy template IDs from API documentation or URL bar</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">5</span><span>Run test extraction on one packing slip + one PO — confirm all fields are returning correctly in JSON</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray3);font-family:var(--mono);margin-bottom:8px">JESSICA RECORDS HERE</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<input type="checkbox" id="jn-templates" class="jnote-toggle">
+<label for="jn-templates" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body">Do this after the call once Nicole sends training files. Wait for Koncile developer docs email (the possibly-French one) — it should contain the private reconciliation endpoint details. Field names you set in Koncile templates become JSON keys referenced in n8n, so be consistent with snake_case.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Packing Slip Template ID</div><textarea class="qa-answer" data-key="cred_koncile_ps_template" placeholder="tmpl_xxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">PO Template ID</div><textarea class="qa-answer" data-key="cred_koncile_po_template" placeholder="tmpl_xxxxxxxxxxxx" style="min-height:36px;font-family:var(--mono);font-size:12px"></textarea></div>
+<input type="checkbox" id="jn-wiring" class="jnote-toggle">
+<label for="jn-wiring" class="jnote-label"><span class="jnote-arrow">▶</span> 🗒️ My Notes</label>
+<div class="jnote-body">Do this last after all credentials collected. Green checkmark on credential test only means OAuth2 token was issued — not that permissions work. Real test: make an actual SharePoint API call, send a test email, upload a test file to Koncile. Credential names must match exactly (Keehan-Koncile, Keehan-M365) or the workflow JSON references will break.</div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">Custom Field Names (as they appear in JSON)</div><textarea class="qa-answer" data-key="cred_koncile_fields" placeholder="po_number: ___&#10;part_number: ___&#10;qty: ___&#10;unit_price: ___&#10;job_ref: ___&#10;tariff_line: ___" style="min-height:80px;font-family:var(--mono);font-size:12px"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. N8N CREDENTIALS WIRING -->
+  <div class="card" style="border-left:4px solid #22c55e;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:20px">🔌</div>
+        <div><div style="font-size:15px;font-weight:700;color:var(--navy)">8 — Wire Credentials into n8n</div><div style="font-size:11px;color:var(--gray3);font-family:var(--mono)">All credentials from steps above get added to n8n as named credential objects — done by Jessica</div></div>
+      </div>
+      <span class="status status-pending">Jessica configures</span>
+    </div>
+    <div style="font-size:13px;line-height:1.9">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="padding:10px 12px;background:var(--gray1);border-radius:6px;border:1px solid var(--gray2)"><div style="font-weight:700;margin-bottom:4px">Koncile API</div><div style="color:var(--gray4);font-family:var(--mono);font-size:11px">Credential type: Header Auth<br>Name: Keehan-Koncile<br>Header: X-API-Key → [API Key from step 1]</div></div>
+        <div style="padding:10px 12px;background:var(--gray1);border-radius:6px;border:1px solid var(--gray2)"><div style="font-weight:700;margin-bottom:4px">Microsoft 365 OAuth2</div><div style="color:var(--gray4);font-family:var(--mono);font-size:11px">Credential type: Microsoft OAuth2<br>Name: Keehan-M365<br>Client ID + Secret + Tenant from step 3</div></div>
+        <div style="padding:10px 12px;background:var(--gray1);border-radius:6px;border:1px solid var(--gray2)"><div style="font-weight:700;margin-bottom:4px">OneDrive Node</div><div style="color:var(--gray4);font-family:var(--mono);font-size:11px">Uses: Keehan-M365 credential<br>Folder ID: Drive ID from step 4</div></div>
+        <div style="padding:10px 12px;background:var(--gray1);border-radius:6px;border:1px solid var(--gray2)"><div style="font-weight:700;margin-bottom:4px">SharePoint Node</div><div style="color:var(--gray4);font-family:var(--mono);font-size:11px">Uses: Keehan-M365 credential<br>Site ID + folder path from step 5</div></div>
+        <div style="padding:10px 12px;background:var(--gray1);border-radius:6px;border:1px solid var(--gray2)"><div style="font-weight:700;margin-bottom:4px">Outlook Node</div><div style="color:var(--gray4);font-family:var(--mono);font-size:11px">Uses: Keehan-M365 credential<br>Send to: Nicole's email from step 6</div></div>
+        <div style="padding:10px 12px;background:var(--gray1);border-radius:6px;border:1px solid var(--gray2)"><div style="font-weight:700;margin-bottom:4px">Credential test</div><div style="color:var(--gray4);font-family:var(--mono);font-size:11px">n8n Settings → Credentials → Test each one — all must show green checkmark before build</div></div>
+      </div>
+    </div>
+    <div style="margin-top:12px"><div style="font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:3px">All credentials tested green? Notes:</div><textarea class="qa-answer" data-key="cred_n8n_wiring" placeholder="Koncile ✓  M365 ✓  OneDrive ✓  SharePoint ✓  Outlook ✓  Notes: ___" style="min-height:40px;font-family:var(--mono);font-size:12px;width:100%"></textarea></div>
+  </div>
+
+  <!-- CALL CHECKLIST -->
+  <div class="card" style="margin-top:20px;background:var(--navy);border-color:var(--navy)">
+    <div class="card-title" style="color:rgba(255,255,255,.6)">📋 SETUP CALL EXIT CHECKLIST — Don't end the call until all of these are checked</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Koncile account created + Advanced plan active</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Jessica added as Koncile admin</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Koncile API key copied and saved</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> n8n instance live and accessible</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Azure AD app registered + Client ID + Secret copied</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> API permissions granted in Azure (Files, Mail, Sites)</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> OneDrive intake + processed folders created</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> SharePoint PO folder path confirmed</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Nicole's exact email address confirmed</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Error alert email confirmed</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> All n8n credentials wired + tested green</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Test scan confirmed → PDF appears in OneDrive intake folder</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Test email sent via n8n → Nicole received it</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;color:white"><input type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)"> Nicole walked through n8n dashboard</label>
+    </div>
+  </div>
+
+  <!-- GENERAL NOTES -->
+  <div class="qa-block" style="margin-top:16px"><div class="qa-question"><span class="qa-num info">NOTES</span> Setup call notes — anything not captured above</div><textarea class="qa-answer" data-key="credentials_notes" placeholder="General notes from the call..." style="min-height:80px"></textarea></div>
+</div>
+<div id="s-questions" class="slab">
+<div class="section-header"><div class="section-icon">❓</div><div><div class="section-title">Open Questions <span class="new-tag">Updated</span></div><div class="section-desc">All unresolved items — type answers, auto-saved to browser</div></div></div>
+
+  <div class="callout info"><div class="callout-icon">💡</div><div class="callout-body">Answers auto-save as you type (1.5s debounce). Hit <strong>Save Notes</strong> in the header to confirm. Green border = answered.</div></div>
+
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q1 CRITICAL</span> Koncile Advanced API — does cross-document reconciliation endpoint exist?</div><div class="qa-context">Email sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="75161a1b01141601351e1a1b161c19105b141c">[email&#160;protected]</a>. Answer determines Path A vs Path B. If yes: what is the endpoint and request/response schema?</div><textarea class="qa-answer" data-key="q1" placeholder="Koncile response: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q2 CRITICAL</span> Will all packing slips be PDF or could scanner output JPG/PNG?</div><div class="qa-context">Scanner not purchased yet. Mobile camera option raised by Mike produces JPG. Need to know before hardcoding n8n trigger filter. Ask Nicole.</div><textarea class="qa-answer" data-key="q2" placeholder="Answer: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q3</span> Do any vendors send packing slips digitally? What format?</div><div class="qa-context">If yes — PDF, Excel, or image? Would need separate n8n intake path (IMAP email trigger vs OneDrive trigger).</div><textarea class="qa-answer" data-key="q3" placeholder="Answer: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q4</span> Exact tariff part number in Vision?</div><div class="qa-context">Nicole's best guess: "KSCTARF" — not confirmed. Required before Koncile template training.</div><textarea class="qa-answer" data-key="q4" placeholder="Confirmed: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q5</span> Exact freight part number in Vision?</div><div class="qa-context">Different from tariff — different part number and different GL account.</div><textarea class="qa-answer" data-key="q5" placeholder="Confirmed: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q6</span> Finalized naming convention for POs and packing slips?</div><div class="qa-context">Nicole to define and distribute to all PO creators. Must be consistent before automation goes live.</div><textarea class="qa-answer" data-key="q6" placeholder="Confirmed convention: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q7</span> Which vendor has tariffs on every line — permanent Phase 1 exclusion?</div><div class="qa-context">Nicole said "nope" on 03/19. Confirm if permanent or deferred to later phase.</div><textarea class="qa-answer" data-key="q7" placeholder="Answer: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q8</span> Desktop scanner purchased? Model?</div><div class="qa-context">Canon or Epson desktop agreed. No purchase confirmed. Nothing flows without it.</div><textarea class="qa-answer" data-key="q8" placeholder="Model / purchase status: "></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q9</span> What fields does Nicole complete in Vision during receiving?</div><div class="qa-context">Need exact Vision field names to ensure PDF report columns match what she keys in. Nicole said pricing is the main one.</div><textarea class="qa-answer" data-key="q9" placeholder="Vision fields:&#10;1. ___&#10;2. ___&#10;3. ___" style="min-height:80px"></textarea></div>
+  <div class="qa-block"><div class="qa-question"><span class="qa-num open">Q10</span> Internal ERP replacement decision from Keehan?</div><div class="qa-context">Nicole raised Vision replacement unprompted on 03/19. Affects Phase 2 planning significantly.</div><textarea class="qa-answer" data-key="q10" placeholder="Answer: "></textarea></div>
+</div>
+<div id="s-risks" class="slab">
+<div class="section-header"><div class="section-icon">⚠️</div><div><div class="section-title">Risks & Mitigation</div><div class="section-desc">Everything that could block or break the project</div></div></div>
+
+  <div class="callout risk"><div class="callout-icon">🔴</div><div class="callout-body"><div class="callout-title">HIGH — No Scanner in Warehouse</div>Nothing flows until packing slips can be digitized. No purchase confirmed as of 03/19. <strong>Owner: Keehan (To Be Assigned)</strong></div></div>
+  <div class="callout risk"><div class="callout-icon">🔴</div><div class="callout-body"><div class="callout-title">HIGH — Naming Convention Not Enforced</div>n8n uses extracted PO# to find the matching PO file in SharePoint by filename. Inconsistent naming = failed lookup = broken workflow. <strong>Owner: Nicole</strong></div></div>
+  <div class="callout warn"><div class="callout-icon">🟡</div><div class="callout-body"><div class="callout-title">MEDIUM — Packing Slip Format Unknown <span class="new-tag">New</span></div>If scanner outputs JPG or vendor emails Excel, PDF-only trigger silently misses them. Confirm before building trigger. <strong>Ask Nicole on next call.</strong></div></div>
+  <div class="callout warn"><div class="callout-icon">🟡</div><div class="callout-body"><div class="callout-title">MEDIUM — Koncile Endpoint Unconfirmed</div>Path B (fallback) is fully buildable if endpoint is UI-only. Not a blocker — changes build approach only. <strong>Awaiting Koncile email.</strong></div></div>
+  <div class="callout warn"><div class="callout-icon">🟡</div><div class="callout-body"><div class="callout-title">MEDIUM — Tariff Part Number Unconfirmed</div>KSCTARF is best guess. If wrong, Koncile templates and n8n tariff logic will need correction. <strong>Owner: Nicole</strong></div></div>
+  <div class="callout warn"><div class="callout-icon">🟡</div><div class="callout-body"><div class="callout-title">MEDIUM — ERP Replacement Brewing</div>Nicole raised Vision replacement unprompted. If mid-pilot, business rules need remapping. Good news: Koncile + n8n carries over regardless of ERP. <strong>Monitor.</strong></div></div>
+  <div class="callout info"><div class="callout-icon">🔵</div><div class="callout-body"><div class="callout-title">LOW — Vendor Format Surprises</div>Koncile's LLM approach handles novel layouts well. Confidence check routing handles low-confidence gracefully. Acceptable risk.</div></div>
+
+  <div class="qa-block" style="margin-top:20px"><div class="qa-question"><span class="qa-num info">NOTES</span> Additional risk notes</div><textarea class="qa-answer" data-key="risk_notes" placeholder="..." style="min-height:70px"></textarea></div>
+</div>
+<div id="s-timeline" class="slab">
+<div class="section-header"><div class="section-icon">📅</div><div><div class="section-title">Timeline & Status <span class="new-tag">Updated</span></div><div class="section-desc">Full project history and what's next</div></div></div>
+
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Initial discovery call with Steve</div><div class="prog-owner">Dec 8, 2025</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Vision ERP research + Lisa Street call — zero integration confirmed</div><div class="prog-owner">Jan 2026</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Tool evaluation → Koncile + n8n selected</div><div class="prog-owner">Jan 2026</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Scope of work finalized</div><div class="prog-owner">Jan 2026</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Process discovery with Nicole — full workflow deep-dive</div><div class="prog-owner">Mar 19, 2026</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Koncile plan research → upgraded to Advanced €199 for API access</div><div class="prog-owner">Mar 2026</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-done">✅</div><div><div class="prog-text">Both workflow paths (A + B) fully designed</div><div class="prog-owner">Mar 26, 2026</div></div><span class="status status-done">Complete</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">📧</div><div><div class="prog-text">Send Koncile email re: private reconciliation endpoint</div><div class="prog-owner">Owner: Jessica · Due: Now</div></div><span class="status status-pending">Send Now</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">📧</div><div><div class="prog-text">Email Nicole to schedule credentials + access setup call</div><div class="prog-owner">Owner: Jessica · Due: Mon Mar 24</div></div><span class="status status-pending">Pending</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">📁</div><div><div class="prog-text">Nicole sends training data (Excel, POs, packing slips, keywords, part numbers)</div><div class="prog-owner">Owner: Nicole</div></div><span class="status status-pending">Pending</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">🏷️</div><div><div class="prog-text">Nicole finalizes naming convention + distributes to all PO creators</div><div class="prog-owner">Owner: Nicole</div></div><span class="status status-pending">Pending</span></div>
+    <div class="prog-item"><div class="prog-icon pi-block">🖨️</div><div><div class="prog-text">Purchase desktop scanner for warehouse (Canon or Epson)</div><div class="prog-owner">Owner: To Be Assigned · Keehan</div></div><span class="status status-blocked">Unassigned</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">🔐</div><div><div class="prog-text">Credentials setup call — Koncile, n8n, OneDrive, Outlook</div><div class="prog-owner">Owner: Jessica + Nicole</div></div><span class="status status-pending">Not Scheduled</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">🏗️</div><div><div class="prog-text">Build: Koncile templates + chosen workflow path · ~2 weeks</div><div class="prog-owner">Owner: Jessica · Starts after credentials + training data</div></div><span class="status status-pending">Not Started</span></div>
+    <div class="prog-item"><div class="prog-icon pi-pend">🧪</div><div><div class="prog-text">Pilot run + Nicole sign-off · ~2 weeks after build</div><div class="prog-owner">Owner: Jessica + Nicole</div></div><span class="status status-pending">Not Started</span></div>
+  </div>
+
+  <div class="qa-block" style="margin-top:20px"><div class="qa-question"><span class="qa-num info">NOTES</span> Timeline updates</div><textarea class="qa-answer" data-key="timeline_notes" placeholder="Dates confirmed, calls scheduled, delays..." style="min-height:70px"></textarea></div>
+</div>
+<div id="s-map" class="slab">
+<div class="section-header"><div class="section-icon">🗺️</div><div><div class="section-title">Process Map & n8n Workflow JSON <span class="new-tag">New</span></div><div class="section-desc">Full BPMN swimlane diagram · Exact n8n node specs · Workflow JSON storage</div></div></div>
+
+  <!-- DIAGRAM -->
+  <div class="card" style="padding:16px 12px">
+    <div class="card-title">🗺️ Full Process Swimlane Diagram — Keehan PO Reconciliation Automation</div>
+    <div style="font-size:12px;color:var(--gray3);margin-bottom:12px;font-family:var(--mono)">5 Swimlanes · Happy Path + Error Paths · Path A (🟣) and Path B (🔵) shown · Version 2.0 Mar 2026</div>
+    <div style="overflow-x:auto;border:1px solid var(--gray2);border-radius:8px;background:#fafafa">
+<svg viewBox="0 0 1620 570" xmlns="http://www.w3.org/2000/svg" style="min-width:1620px;height:auto;display:block">
+<defs>
+  <marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+    <polygon points="0 0, 9 4.5, 0 9" fill="#64748b"/>
+  </marker>
+  <marker id="ah-p" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+    <polygon points="0 0, 9 4.5, 0 9" fill="#5b21b6"/>
+  </marker>
+  <marker id="ah-r" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+    <polygon points="0 0, 9 4.5, 0 9" fill="#991b1b"/>
+  </marker>
+  <marker id="ah-g" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+    <polygon points="0 0, 9 4.5, 0 9" fill="#166534"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="1620" height="105" fill="#FEF9C3" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="0" y="105" width="1620" height="100" fill="#DBEAFE" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="0" y="205" width="1620" height="178" fill="#ECFDF5" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="0" y="383" width="1620" height="100" fill="#F5F3FF" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="0" y="483" width="1620" height="87" fill="#FFF7ED" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="0" y="0" width="105" height="105" fill="#f59e0b" opacity="0.18"/>
+<line x1="105" y1="0" x2="105" y2="105" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+<text transform="translate(52,52) rotate(-90)" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.06em">WAREHOUSE (JEFF)</text>
+<rect x="0" y="105" width="105" height="100" fill="#3b82f6" opacity="0.18"/>
+<line x1="105" y1="105" x2="105" y2="205" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+<text transform="translate(52,155) rotate(-90)" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" font-weight="700" fill="#1e40af" letter-spacing="0.06em">ONEDRIVE / SHAREPOINT</text>
+<rect x="0" y="205" width="105" height="178" fill="#22c55e" opacity="0.18"/>
+<line x1="105" y1="205" x2="105" y2="383" stroke="#22c55e" stroke-width="1.5" opacity="0.5"/>
+<text transform="translate(52,294) rotate(-90)" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" font-weight="700" fill="#14532d" letter-spacing="0.06em">n8n AUTOMATION</text>
+<rect x="0" y="383" width="105" height="100" fill="#7c3aed" opacity="0.18"/>
+<line x1="105" y1="383" x2="105" y2="483" stroke="#7c3aed" stroke-width="1.5" opacity="0.5"/>
+<text transform="translate(52,433) rotate(-90)" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" font-weight="700" fill="#4c1d95" letter-spacing="0.06em">KONCILE API</text>
+<rect x="0" y="483" width="105" height="87" fill="#f97316" opacity="0.18"/>
+<line x1="105" y1="483" x2="105" y2="570" stroke="#f97316" stroke-width="1.5" opacity="0.5"/>
+<text transform="translate(52,526) rotate(-90)" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" font-weight="700" fill="#7c2d12" letter-spacing="0.06em">NICOLE / VISION ERP</text>
+<line x1="105" y1="294" x2="1620" y2="294" stroke="#bbf7d0" stroke-width="1" stroke-dasharray="6 4"/>
+<rect x="110" y="3" width="440" height="16" rx="4" fill="rgba(15,37,69,0.06)"/>
+<text x="330" y="14" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#94a3b8" letter-spacing="0.08em">INTAKE</text>
+<rect x="610" y="3" width="275" height="16" rx="4" fill="rgba(15,37,69,0.06)"/>
+<text x="747" y="14" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#94a3b8" letter-spacing="0.08em">EXTRACTION</text>
+<rect x="895" y="3" width="275" height="16" rx="4" fill="rgba(15,37,69,0.06)"/>
+<text x="1032" y="14" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#94a3b8" letter-spacing="0.08em">MATCHING</text>
+<rect x="1180" y="3" width="225" height="16" rx="4" fill="rgba(15,37,69,0.06)"/>
+<text x="1292" y="14" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#94a3b8" letter-spacing="0.08em">RECONCILIATION</text>
+<rect x="1415" y="3" width="190" height="16" rx="4" fill="rgba(15,37,69,0.06)"/>
+<text x="1510" y="14" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#94a3b8" letter-spacing="0.08em">OUTPUT & DELIVERY</text>
+<circle cx="185" cy="52" r="16" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
+<text x="185" y="53" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="14" font-weight="700" fill="white" dominant-baseline="middle">▶</text>
+<rect x="219" y="32" width="112" height="40" rx="7" fill="#374151" stroke="#1f2937" stroke-width="1.5"/>
+<text x="275" y="53" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white" dominant-baseline="middle">Receive Shipment</text>
+<rect x="359" y="32" width="112" height="40" rx="7" fill="#b45309" stroke="#92400e" stroke-width="1.5"/>
+<text x="415" y="46" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Scan Packing Slip</text>
+<text x="415" y="59" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Desktop scanner</text>
+<rect x="499" y="32" width="112" height="40" rx="7" fill="#b45309" stroke="#92400e" stroke-width="1.5"/>
+<text x="555" y="46" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Upload PDF to</text>
+<text x="555" y="59" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">OneDrive Intake</text>
+<line x1="201" y1="52" x2="219" y2="52" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="331" y1="52" x2="359" y2="52" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="471" y1="52" x2="499" y2="52" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="555" y1="72" x2="555" y2="108" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<rect x="496" y="135" width="118" height="40" rx="7" fill="#0369a1" stroke="#075985" stroke-width="1.5"/>
+<text x="555" y="149" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">PDF Stored in</text>
+<text x="555" y="162" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Intake Folder</text>
+<rect x="915" y="135" width="130" height="40" rx="7" fill="#0369a1" stroke="#075985" stroke-width="1.5"/>
+<text x="980" y="149" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Retrieve PO PDF</text>
+<text x="980" y="162" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">from SharePoint</text>
+<line x1="555" y1="175" x2="555" y2="208" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<rect x="1150" y="240" width="200" height="17" rx="9" fill="#ede9fe" stroke="none"/>
+<text x="1250" y="249" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="700" fill="#5b21b6" dominant-baseline="middle">PATH A — If endpoint confirmed</text>
+<rect x="1150" y="332" width="200" height="17" rx="9" fill="#dbeafe" stroke="none"/>
+<text x="1250" y="341" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="700" fill="#1d4ed8" dominant-baseline="middle">PATH B — If endpoint UI-only</text>
+<rect x="496" y="274" width="118" height="40" rx="7" fill="#065f46" stroke="#059669" stroke-width="1.5"/>
+<text x="555" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Watch OneDrive</text>
+<text x="555" y="301" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Folder (Trigger)</text>
+<polygon points="695,270 724,294 695,318 666,294" fill="#b45309" stroke="#92400e" stroke-width="1.5"/>
+<text x="695" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="700" fill="white">Filter</text>
+<text x="695" y="300" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="700" fill="white">PDF Only?</text>
+<rect x="780" y="274" width="120" height="40" rx="7" fill="#5b21b6" stroke="#4c1d95" stroke-width="1.5"/>
+<text x="840" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">POST Packing Slip</text>
+<text x="840" y="301" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">to Koncile API</text>
+<polygon points="980,270 1009,294 980,318 951,294" fill="#b45309" stroke="#92400e" stroke-width="1.5"/>
+<text x="980" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="700" fill="white">Confidence</text>
+<text x="980" y="300" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="700" fill="white">OK?</text>
+<rect x="1055" y="274" width="120" height="40" rx="7" fill="#0369a1" stroke="#075985" stroke-width="1.5"/>
+<text x="1115" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Fetch PO PDF from</text>
+<text x="1115" y="301" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">SharePoint</text>
+<rect x="1191" y="274" width="118" height="40" rx="7" fill="#5b21b6" stroke="#4c1d95" stroke-width="1.5"/>
+<text x="1250" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">POST PO to</text>
+<text x="1250" y="301" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Koncile API</text>
+<rect x="1330" y="229" width="120" height="38" rx="7" fill="#4c1d95" stroke="#3b0764" stroke-width="1.5"/>
+<text x="1390" y="242" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Trigger Reconcile</text>
+<text x="1390" y="255" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Endpoint (Path A)</text>
+<rect x="1330" y="321" width="120" height="38" rx="7" fill="#1d4ed8" stroke="#1e40af" stroke-width="1.5"/>
+<text x="1390" y="334" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Merge + Compute</text>
+<text x="1390" y="347" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Deltas (Path B)</text>
+<rect x="1471" y="274" width="118" height="40" rx="7" fill="#166534" stroke="#14532d" stroke-width="1.5"/>
+<text x="1530" y="288" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Generate PDF</text>
+<text x="1530" y="301" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Report</text>
+<line x1="614" y1="294" x2="666" y2="294" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="724" y1="294" x2="780" y2="294" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="745" y="286" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#b45309" font-weight="600">Yes</text>
+<path d="M695,318 L695,460 L755,460" fill="none" stroke="#991b1b" stroke-width="1.2" marker-end="url(#ah-r)"/>
+<rect x="757" y="448" width="105" height="22" rx="4" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+<text x="810" y="460" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#991b1b" dominant-baseline="middle">Skip: Non-PDF File</text>
+<text x="680" y="330" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#991b1b" font-weight="600">No</text>
+<path d="M840,383 L840,370 L951,294" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#ah)"/>
+<line x1="1009" y1="294" x2="1055" y2="294" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="1030" y="286" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#b45309" font-weight="600">Yes</text>
+<path d="M980,318 L980,510 L1040,510" fill="none" stroke="#991b1b" stroke-width="1.2" marker-end="url(#ah-r)"/>
+<rect x="1042" y="498" width="120" height="22" rx="4" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+<text x="1102" y="509" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" font-weight="600" fill="#991b1b" dominant-baseline="middle">Flag to Nicole: Low Confidence</text>
+<text x="965" y="332" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#991b1b" font-weight="600">No</text>
+<path d="M1115,274 L1115,108" fill="none" stroke="#0369a1" stroke-width="1.3" marker-end="url(#ah)"/>
+<path d="M1045,155 L1045,208" fill="none" stroke="#0369a1" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#ah)"/>
+<text x="1115" y="148" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#0369a1" font-weight="600" font-style="italic">↓ Returns PO PDF</text>
+<path d="M1115,108 L1115,274" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ah)"/>
+<line x1="1175" y1="294" x2="1191" y2="294" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="1309" y1="294" x2="1329" y2="294" stroke="#64748b" stroke-width="1.5"/>
+<path d="M1329,294 L1329,248 L1330,248" fill="none" stroke="#5b21b6" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M1329,294 L1329,340 L1330,340" fill="none" stroke="#1d4ed8" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M1450,248 L1470,248 L1470,294 L1471,294" fill="none" stroke="#166534" stroke-width="1.5" marker-end="url(#ah-g)"/>
+<path d="M1450,340 L1470,340 L1470,294 L1471,294" fill="none" stroke="#166534" stroke-width="1.5" marker-end="url(#ah-g)"/>
+<path d="M1530,314 L1530,483" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<rect x="778" y="413" width="125" height="40" rx="7" fill="#5b21b6" stroke="#4c1d95" stroke-width="1.5"/>
+<text x="840" y="427" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Extract Packing</text>
+<text x="840" y="440" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Slip Data</text>
+<rect x="1190" y="413" width="120" height="40" rx="7" fill="#5b21b6" stroke="#4c1d95" stroke-width="1.5"/>
+<text x="1250" y="427" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Extract PO Data</text>
+<text x="1250" y="440" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">(Path B)</text>
+<rect x="1330" y="413" width="120" height="40" rx="7" fill="#4c1d95" stroke="#3b0764" stroke-width="1.5"/>
+<text x="1390" y="427" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Reconcile</text>
+<text x="1390" y="440" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Documents (Path A)</text>
+<line x1="840" y1="314" x2="840" y2="413" stroke="#5b21b6" stroke-width="1.5" marker-end="url(#ah-p)"/>
+<path d="M1250,314 L1250,413" fill="none" stroke="#5b21b6" stroke-width="1.3" marker-end="url(#ah-p)"/>
+<path d="M1250,413 L1250,390 L1330,340" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ah)"/>
+<path d="M1390,267 L1390,413" fill="none" stroke="#5b21b6" stroke-width="1.3" marker-end="url(#ah-p)"/>
+<path d="M1390,453 L1460,453 L1460,248" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ah)"/>
+<rect x="1466" y="506" width="128" height="40" rx="7" fill="#9a3412" stroke="#7c2d12" stroke-width="1.5"/>
+<text x="1530" y="520" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Review Report &</text>
+<text x="1530" y="533" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="white">Enter in Vision ERP</text>
+<circle cx="1615" cy="526" r="16" fill="none" stroke="#166534" stroke-width="2.5"/>
+<circle cx="1615" cy="526" r="9" fill="#166534"/>
+<line x1="1610" y1="526" x2="1620" y2="526" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="1594" y1="526" x2="1599" y2="526" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="1542" y="398" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#475569" font-style="italic">Email</text>
+<text x="1542" y="410" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#475569" font-style="italic">PDF</text>
+<rect x="110" y="476" width="570" height="72" rx="6" fill="rgba(255,255,255,0.85)" stroke="#e2e8f0" stroke-width="1"/>
+<text x="120" y="490" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#475569">LEGEND</text>
+<rect x="120" y="500" width="52" height="14" rx="3" fill="#065f46"/>
+<text x="146" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">Trigger Node</text>
+<rect x="190" y="500" width="52" height="14" rx="3" fill="#1d4ed8"/>
+<text x="216" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">n8n Process Node</text>
+<rect x="260" y="500" width="52" height="14" rx="3" fill="#b45309"/>
+<text x="286" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">Decision Gateway</text>
+<rect x="330" y="500" width="52" height="14" rx="3" fill="#5b21b6"/>
+<text x="356" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">Koncile API Call</text>
+<rect x="400" y="500" width="52" height="14" rx="3" fill="#0369a1"/>
+<text x="426" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">SharePoint / OneDrive</text>
+<rect x="470" y="500" width="52" height="14" rx="3" fill="#166534"/>
+<text x="496" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">Output / Report</text>
+<rect x="540" y="500" width="52" height="14" rx="3" fill="#9a3412"/>
+<text x="566" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">Manual Step (Nicole)</text>
+<rect x="610" y="500" width="52" height="14" rx="3" fill="#991b1b"/>
+<text x="636" y="522" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">Error Path</text>
+<line x1="140" y1="536" x2="190" y2="536" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ah)"/>
+<text x="200" y="540" font-family="IBM Plex Sans,sans-serif" font-size="8.5" fill="#475569">API response / return data (dashed)</text>
+<text x="1610" y="562" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="8.5" fill="#94a3b8">Keehan Services — PO Reconciliation Automation · v2.0 · Mar 2026 · Plus 1 Technology</text>
+</svg>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--gray3);font-family:var(--mono)">
+      Diagram follows BPMN swimlane notation per Plus 1 Workflow &amp; Diagram Mastery Guide · Verb+Noun naming convention · Color-coded by actor type · Dashed lines = API return data
+    </div>
+  </div>
+
+  <!-- N8N NODE BREAKDOWN PATH A -->
+  <div class="card" style="margin-top:20px;border-color:#7c3aed;border-left:4px solid #7c3aed">
+    <div class="card-title" style="color:#5b21b6">🟣 PATH A — Exact n8n Node Specs (6 Nodes — If Koncile Endpoint Confirmed)</div>
+    <div class="table-wrap" style="margin:0"><table style="margin:0;font-size:12px">
+      <tr><th style="width:30px">#</th><th style="width:160px">Node Name</th><th style="width:120px">Node Type</th><th>Configuration / Key Settings</th><th style="width:120px">Output</th></tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">01</span></td>
+        <td><strong>Watch OneDrive Intake Folder</strong></td>
+        <td><span class="chip chip-green">Trigger</span></td>
+        <td>Microsoft OneDrive trigger · Watch folder: <span class="mono">/Packing-Slips-Intake/</span> · Event: File Created · Poll interval: 1 min · IF node filters <span class="mono">.pdf</span> extension only</td>
+        <td>File path, name, URL</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">02</span></td>
+        <td><strong>Upload Both Docs to Koncile</strong></td>
+        <td><span class="chip chip-purple">HTTP Request ×2</span></td>
+        <td>Call 1: POST packing slip to <span class="mono">POST /v1/upload_file</span> → store <span class="mono">document_id_PS</span>. Fetch PO from SharePoint using extracted PO# → Call 2: POST PO → store <span class="mono">document_id_PO</span>. Poll both: <span class="mono">GET /v1/fetch_document_data</span> until <span class="mono">status=DONE</span>. Error if PO not found → email Nicole.</td>
+        <td>document_id_PS, document_id_PO</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">03</span></td>
+        <td><strong>Trigger Reconcile Endpoint</strong></td>
+        <td><span class="chip chip-purple">HTTP Request</span></td>
+        <td>POST to Koncile private reconciliation endpoint (to be confirmed by Koncile support). Body: <span class="mono">{"po_document_id": "{{doc_id_PO}}", "packing_slip_document_id": "{{doc_id_PS}}"}</span>. Receive <span class="mono">reconciliation_job_id</span> → poll until <span class="mono">status=complete</span> → GET result.</td>
+        <td>line_matches JSON array, match scores</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">04</span></td>
+        <td><strong>Confidence Check + Route</strong></td>
+        <td><span class="chip chip-amber">Switch Node</span></td>
+        <td>If any <span class="mono">confidence_score &lt; 0.85</span> → branch to error email to Nicole with original PDFs attached. High confidence → continue. PO not found branch → separate error email.</td>
+        <td>Routes to email or continues</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">05</span></td>
+        <td><strong>Compute Deltas in n8n</strong></td>
+        <td><span class="chip chip-blue">Code Node (JS)</span></td>
+        <td>Takes Koncile line_matches array. Computes: backorder_qty = ordered−received where &gt;0 · price_variance = PO_price−invoice_price · substitute_flag = part# match but description differs · tariff_sum = sum all KSCTARF lines grouped by job_reference · builds flat report array</td>
+        <td>Flat reconciled array</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">06</span></td>
+        <td><strong>Generate PDF + Email Nicole</strong></td>
+        <td><span class="chip chip-green">PDF Node + Outlook</span></td>
+        <td>Formats report array into PDF template with all columns. Outlook Node: To = Nicole's email · Subject: <span class="mono">Reconciled PO {{PO#}} — {{X}} items, {{Y}} variances</span> · Attachment: PDF</td>
+        <td>Email sent to Nicole</td>
+      </tr>
+    </table></div>
+  </div>
+
+  <!-- N8N NODE BREAKDOWN PATH B -->
+  <div class="card" style="margin-top:16px;border-color:#2563eb;border-left:4px solid #2563eb">
+    <div class="card-title" style="color:var(--blue-mid)">🔵 PATH B — Exact n8n Node Specs (9 Nodes — Confirmed Available, Public API)</div>
+    <div class="table-wrap" style="margin:0"><table style="margin:0;font-size:12px">
+      <tr><th style="width:30px">#</th><th style="width:160px">Node Name</th><th style="width:120px">Node Type</th><th>Configuration / Key Settings</th><th style="width:120px">Output</th></tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">01</span></td>
+        <td><strong>Watch OneDrive Intake Folder</strong></td>
+        <td><span class="chip chip-green">Trigger</span></td>
+        <td>Same as Path A. Watch <span class="mono">/Packing-Slips-Intake/</span> · IF node: file extension = <span class="mono">.pdf</span> · Non-PDF → log and ignore</td>
+        <td>File path, name, URL</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">02</span></td>
+        <td><strong>Extract Packing Slip via Koncile</strong></td>
+        <td><span class="chip chip-purple">HTTP Request</span></td>
+        <td><span class="mono">POST /v1/upload_file</span> with packing slip PDF · Poll until <span class="mono">status=DONE</span> · <span class="mono">GET /v1/fetch_document_data</span> → parse <span class="mono">General_fields</span> (PO#, vendor, date) + <span class="mono">Line_fields[]</span> (part_number, qty, price, description) with confidence scores</td>
+        <td>PS JSON with line items</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">03</span></td>
+        <td><strong>Confidence Check — Packing Slip</strong></td>
+        <td><span class="chip chip-amber">Switch Node</span></td>
+        <td>Check confidence on PO#, part_numbers, qty fields. Below 0.85 on any critical field → email Nicole with original PDF flagged for manual review. Pass → continue.</td>
+        <td>Routes to email or continues</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">04</span></td>
+        <td><strong>Fetch + Upload PO from SharePoint</strong></td>
+        <td><span class="chip chip-blue">OneDrive + HTTP</span></td>
+        <td>Use extracted PO# to search SharePoint <span class="mono">/Purchase-Orders/2026/</span> folder for file matching <span class="mono">*PO#*</span> pattern · Download PDF · If not found → error email to Nicole · Upload PO PDF to Koncile: <span class="mono">POST /v1/upload_file</span></td>
+        <td>document_id_PO</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">05</span></td>
+        <td><strong>Extract PO via Koncile API</strong></td>
+        <td><span class="chip chip-purple">HTTP Request</span></td>
+        <td>Poll until <span class="mono">status=DONE</span> · <span class="mono">GET /v1/fetch_document_data</span> · Parse <span class="mono">Line_fields[]</span>: part_number, qty_ordered, unit_price, job_reference with confidence scores</td>
+        <td>PO JSON with line items</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">06</span></td>
+        <td><strong>Merge + Reconciliation Logic</strong></td>
+        <td><span class="chip chip-blue">Merge + Code Node</span></td>
+        <td>Merge Node: join PS Line_fields + PO Line_fields arrays · Code Node (JS): Match by part_number exact first, fuzzy fallback on description · For each line: backorder_qty = ordered−received · price_variance $ &amp; % · unmatched PO lines = backorder · unmatched PS lines = unexpected · substitute flag = part# match but description differs · tariff_sum per job_reference (KSCTARF mapping)</td>
+        <td>Reconciled array with all deltas</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">07</span></td>
+        <td><strong>Discrepancy Check + Route</strong></td>
+        <td><span class="chip chip-amber">IF Node</span></td>
+        <td>Any variances, backorders, substitutes, or unexpected items? → Report includes highlighted discrepancy section. Clean? → Clean report. Both paths produce PDF and email.</td>
+        <td>Sets report_type flag</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">08</span></td>
+        <td><strong>Generate PDF Report</strong></td>
+        <td><span class="chip chip-green">HTML→PDF Node</span></td>
+        <td>Format reconciled array into Nicole's report template. Columns: Part # · Ordered · Received · Outstanding · PO Price · Invoice Price · Variance · Job · Tariff · Flags. Summary: X matched, Y variances, Z backorders, tariff total.</td>
+        <td>PDF binary / URL</td>
+      </tr>
+      <tr>
+        <td><span class="mono" style="color:var(--blue-mid);font-weight:700">09</span></td>
+        <td><strong>Email PDF to Nicole</strong></td>
+        <td><span class="chip chip-green">Outlook Node</span></td>
+        <td>OAuth2 connection · To: Nicole's Outlook · Subject: <span class="mono">Reconciled PO {{PO#}} — {{X}} items, {{Y}} variances, {{Z}} tariffs</span> · Body: summary of discrepancies · Attachment: PDF report</td>
+        <td>Email delivered</td>
+      </tr>
+    </table></div>
+  </div>
+
+  <!-- CREDENTIAL REQUIREMENTS -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">🔑 n8n Credential Setup (Both Paths)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12.5px">
+      <div style="padding:10px 14px;background:var(--purple-light);border-radius:6px;border-left:3px solid #7c3aed">
+        <div style="font-weight:700;color:#5b21b6;margin-bottom:4px">Koncile API Key</div>
+        <div style="color:var(--gray4)">Header: <span class="mono">X-API-Key: {{KONCILE_API_KEY}}</span><br>Base URL: <span class="mono">https://api.koncile.ai</span><br>Plan: Advanced (€199/mo) required</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--blue-pale);border-radius:6px;border-left:3px solid #2563eb">
+        <div style="font-weight:700;color:var(--blue-mid);margin-bottom:4px">Microsoft 365 OAuth2</div>
+        <div style="color:var(--gray4)">Scope: Files.ReadWrite, Mail.Send<br>Used for: OneDrive trigger, SharePoint read, Outlook send<br>Register app in Azure AD</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON STORAGE -->
+  <div style="margin-top:24px">
+    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;display:flex;align-items:center;gap:10px">
+      <span>⚙️ n8n Workflow JSON Storage</span>
+      <span class="new-tag">Save Locally</span>
+    </div>
+    <div style="font-size:12px;color:var(--gray3);font-family:var(--mono);margin-bottom:16px">Paste your exported n8n JSON here — auto-saves to browser. Export from n8n: Workflow menu → Download</div>
+
+    <div class="card" style="border-color:#7c3aed">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="color:#5b21b6;margin:0">🟣 PATH A — Workflow JSON (Paste when built)</div>
+        <button onclick="copyJSON('path_a_json')" style="background:var(--purple-light);color:#5b21b6;border:1px solid #c4b5fd;border-radius:5px;padding:4px 12px;font-size:11px;font-family:var(--mono);cursor:pointer;font-weight:600">Copy JSON</button>
+      </div>
+      <textarea class="qa-answer" data-key="path_a_json" id="path_a_json" placeholder='{
+  "name": "Keehan PO Reconciliation - Path A",
+  "nodes": [
+    {
+      "id": "01-onedrive-trigger",
+      "name": "Watch OneDrive Intake Folder",
+      "type": "n8n-nodes-base.microsoftOneDriveTrigger",
+      ...
+    }
+  ],
+  "connections": {},
+  "settings": {}
+}' style="min-height:200px;width:100%;font-family:var(--mono);font-size:11.5px"></textarea>
+    </div>
+
+    <div class="card" style="border-color:var(--blue-mid);margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="color:var(--blue-mid);margin:0">🔵 PATH B — Workflow JSON (Paste when built)</div>
+        <button onclick="copyJSON('path_b_json')" style="background:var(--blue-light);color:var(--blue-mid);border:1px solid #93c5fd;border-radius:5px;padding:4px 12px;font-size:11px;font-family:var(--mono);cursor:pointer;font-weight:600">Copy JSON</button>
+      </div>
+      <textarea class="qa-answer" data-key="path_b_json" id="path_b_json" placeholder='{
+  "name": "Keehan PO Reconciliation - Path B",
+  "nodes": [
+    {
+      "id": "01-onedrive-trigger",
+      "name": "Watch OneDrive Intake Folder",
+      "type": "n8n-nodes-base.microsoftOneDriveTrigger",
+      ...
+    }
+  ],
+  "connections": {},
+  "settings": {}
+}' style="min-height:200px;width:100%;font-family:var(--mono);font-size:11.5px"></textarea>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin:0">📋 Koncile Template Config (Paste API template IDs when created)</div>
+        <button onclick="copyJSON('koncile_templates')" style="background:var(--gray1);color:var(--gray4);border:1px solid var(--gray2);border-radius:5px;padding:4px 12px;font-size:11px;font-family:var(--mono);cursor:pointer;font-weight:600">Copy</button>
+      </div>
+      <textarea class="qa-answer" data-key="koncile_templates" id="koncile_templates" placeholder='Koncile Template IDs (fill in after account setup):
+
+Packing Slip Template ID: _______________
+PO Template ID:           _______________
+API Base URL:             https://api.koncile.ai
+Auth Header:              X-API-Key: [KEY HERE]
+
+Custom fields to configure in Koncile templates:
+- PO number field name: _______________
+- Part number field name: _______________
+- Quantity field name: _______________
+- Unit price field name: _______________
+- Job reference field name: _______________
+- Tariff line identifier: KSCTARF (confirm with Nicole)' style="min-height:140px;width:100%;font-family:var(--mono);font-size:11.5px"></textarea>
+    </div>
+  </div>
+</div>
+<div id="s-notes" class="slab">
+<div class="section-header"><div class="section-icon">📝</div><div><div class="section-title">My Notes</div><div class="section-desc">Free-form working notes — auto-saved to browser</div></div></div>
+
+  <div class="card"><div class="card-title">📋 General Project Notes</div><textarea class="qa-answer" data-key="notes_general" placeholder="General notes..." style="min-height:120px;width:100%"></textarea></div>
+  <div class="card"><div class="card-title">📞 Credentials Call Notes</div><textarea class="qa-answer" data-key="notes_creds_call" placeholder="Notes from credentials call with Nicole..." style="min-height:100px;width:100%"></textarea></div>
+  <div class="card"><div class="card-title">🔧 Build Notes — n8n & Koncile Config</div><textarea class="qa-answer" data-key="notes_build" placeholder="API keys location, node config, issues..." style="min-height:100px;width:100%"></textarea>
+</div>
+  
+
+
+<script>
+
+</script>
+</body>
+</html>
