@@ -1,0 +1,147 @@
+{
+  "name": "ClickUp Capacity Proxy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "clickup-capacity",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "clickup-capacity-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ⚠️  PASTE YOUR EXISTING 'Fetch All Pages Simple' CODE HERE\n// This placeholder just passes data through unchanged.\nreturn $input.all();"
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Fetch All Pages Simple",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const TARGET_LISTS = [\n  'general tasks',\n  'project tasks',\n  'ai project tasks',\n  'project roadmap'\n];\n\nconst tasks = $input.first().json.tasks || [];\nconst taskRows = [];\nconst assigneeRows = [];\n\nfor (const task of tasks) {\n  const listName = (task.list?.name || '').toLowerCase().trim();\n  if (!TARGET_LISTS.includes(listName)) continue;\n\n  let priority = null;\n  if (task.priority) {\n    priority = typeof task.priority === 'object'\n      ? (task.priority.priority || '').toLowerCase()\n      : task.priority.toLowerCase();\n  }\n\n  taskRows.push({\n    id: task.id,\n    name: task.name,\n    status: task.status?.status || task.status || 'unknown',\n    priority,\n    list_name: task.list?.name || null,\n    updated_at: new Date().toISOString()\n  });\n\n  for (const a of (task.assignees || [])) {\n    assigneeRows.push({\n      task_id: task.id,\n      member_id: a.id,\n      member_name: a.username || String(a.id)\n    });\n  }\n}\n\nreturn [{ json: { taskRows, assigneeRows } }];"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Shape for Supabase",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/clickup_tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "YOUR_SUPABASE_ANON_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_ANON_KEY" },
+            { "name": "Content-Type",  "value": "application/json" },
+            { "name": "Prefer",        "value": "resolution=merge-duplicates" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.taskRows }}",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Upsert Tasks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/clickup_task_assignees",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "YOUR_SUPABASE_ANON_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_ANON_KEY" },
+            { "name": "Content-Type",  "value": "application/json" },
+            { "name": "Prefer",        "value": "resolution=merge-duplicates" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Shape for Supabase').item.json.assigneeRows }}",
+        "options": {}
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Upsert Assignees",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/rpc/get_capacity",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "YOUR_SUPABASE_ANON_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_ANON_KEY" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "Query Capacity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Fetch All Pages Simple", "type": "main", "index": 0 }]]
+    },
+    "Fetch All Pages Simple": {
+      "main": [[{ "node": "Shape for Supabase", "type": "main", "index": 0 }]]
+    },
+    "Shape for Supabase": {
+      "main": [[{ "node": "Upsert Tasks", "type": "main", "index": 0 }]]
+    },
+    "Upsert Tasks": {
+      "main": [[{ "node": "Upsert Assignees", "type": "main", "index": 0 }]]
+    },
+    "Upsert Assignees": {
+      "main": [[{ "node": "Query Capacity", "type": "main", "index": 0 }]]
+    },
+    "Query Capacity": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}
