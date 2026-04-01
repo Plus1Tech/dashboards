@@ -17,81 +17,23 @@
     },
     {
       "parameters": {
-        "jsCode": "// ⚠️  PASTE YOUR EXISTING 'Fetch All Pages Simple' CODE HERE\n// This placeholder just passes data through unchanged.\nreturn $input.all();"
+        "jsCode": "const SUPABASE_URL = 'https://pdsvsxzjbkcvychbzqit.supabase.co';\nconst SUPABASE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';\nconst CLICKUP_KEY  = 'YOUR_NEW_CLICKUP_API_KEY';\n\nconst TARGET_LISTS = [\n  'general tasks', 'project tasks', 'ai project tasks', 'project roadmap'\n];\nconst MAX_PAGES = 20;\n\nlet page = 0;\nlet totalUpserted = 0;\n\nwhile (page < MAX_PAGES) {\n  const response = await this.helpers.httpRequest({\n    method: 'GET',\n    url: 'https://api.clickup.com/api/v2/team/9017426462/task',\n    headers: { 'Authorization': CLICKUP_KEY },\n    qs: {\n      page,\n      'space_ids[]': '90172135105',\n      subtasks: false,\n      include_closed: false\n    }\n  });\n\n  const tasks = response.tasks || [];\n  if (tasks.length === 0) break;\n\n  const taskRows = [];\n  const assigneeRows = [];\n\n  for (const task of tasks) {\n    const listName = (task.list?.name || '').toLowerCase().trim();\n    if (!TARGET_LISTS.includes(listName)) continue;\n\n    let priority = null;\n    if (task.priority) {\n      priority = typeof task.priority === 'object'\n        ? (task.priority.priority || '').toLowerCase()\n        : task.priority.toLowerCase();\n    }\n\n    taskRows.push({\n      id: task.id,\n      name: task.name,\n      status: task.status?.status || task.status || 'unknown',\n      priority,\n      list_name: task.list?.name || null,\n      updated_at: new Date().toISOString()\n    });\n\n    for (const a of (task.assignees || [])) {\n      assigneeRows.push({\n        task_id: task.id,\n        member_id: a.id,\n        member_name: a.username || String(a.id)\n      });\n    }\n  }\n\n  if (taskRows.length > 0) {\n    await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'https://pdsvsxzjbkcvychbzqit.supabase.co/rest/v1/clickup_tasks',\n      headers: {\n        'apikey': SUPABASE_KEY,\n        'Authorization': `Bearer ${SUPABASE_KEY}`,\n        'Content-Type': 'application/json',\n        'Prefer': 'resolution=merge-duplicates'\n      },\n      body: taskRows,\n      json: true\n    });\n  }\n\n  if (assigneeRows.length > 0) {\n    await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'https://pdsvsxzjbkcvychbzqit.supabase.co/rest/v1/clickup_task_assignees',\n      headers: {\n        'apikey': SUPABASE_KEY,\n        'Authorization': `Bearer ${SUPABASE_KEY}`,\n        'Content-Type': 'application/json',\n        'Prefer': 'resolution=merge-duplicates'\n      },\n      body: assigneeRows,\n      json: true\n    });\n  }\n\n  totalUpserted += taskRows.length;\n  if (tasks.length < 100) break;\n  page++;\n}\n\nreturn [{ json: { totalUpserted } }];"
       },
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "name": "Fetch All Pages Simple",
+      "name": "Fetch and Upsert Pages",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [460, 300]
     },
     {
       "parameters": {
-        "jsCode": "const TARGET_LISTS = [\n  'general tasks',\n  'project tasks',\n  'ai project tasks',\n  'project roadmap'\n];\n\nconst tasks = $input.first().json.tasks || [];\nconst taskRows = [];\nconst assigneeRows = [];\n\nfor (const task of tasks) {\n  const listName = (task.list?.name || '').toLowerCase().trim();\n  if (!TARGET_LISTS.includes(listName)) continue;\n\n  let priority = null;\n  if (task.priority) {\n    priority = typeof task.priority === 'object'\n      ? (task.priority.priority || '').toLowerCase()\n      : task.priority.toLowerCase();\n  }\n\n  taskRows.push({\n    id: task.id,\n    name: task.name,\n    status: task.status?.status || task.status || 'unknown',\n    priority,\n    list_name: task.list?.name || null,\n    updated_at: new Date().toISOString()\n  });\n\n  for (const a of (task.assignees || [])) {\n    assigneeRows.push({\n      task_id: task.id,\n      member_id: a.id,\n      member_name: a.username || String(a.id)\n    });\n  }\n}\n\nreturn [{ json: { taskRows, assigneeRows } }];"
-      },
-      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-      "name": "Shape for Supabase",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [680, 300]
-    },
-    {
-      "parameters": {
         "method": "POST",
-        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/clickup_tasks",
+        "url": "https://pdsvsxzjbkcvychbzqit.supabase.co/rest/v1/rpc/get_capacity",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey",        "value": "YOUR_SUPABASE_ANON_KEY" },
-            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_ANON_KEY" },
-            { "name": "Content-Type",  "value": "application/json" },
-            { "name": "Prefer",        "value": "resolution=merge-duplicates" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.taskRows }}",
-        "options": {}
-      },
-      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
-      "name": "Upsert Tasks",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
-      "position": [900, 300]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/clickup_task_assignees",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "YOUR_SUPABASE_ANON_KEY" },
-            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_ANON_KEY" },
-            { "name": "Content-Type",  "value": "application/json" },
-            { "name": "Prefer",        "value": "resolution=merge-duplicates" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $('Shape for Supabase').item.json.assigneeRows }}",
-        "options": {}
-      },
-      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
-      "name": "Upsert Assignees",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
-      "position": [1120, 300]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/rpc/get_capacity",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "YOUR_SUPABASE_ANON_KEY" },
-            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_ANON_KEY" },
+            { "name": "apikey",        "value": "YOUR_SUPABASE_SERVICE_ROLE_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_SERVICE_ROLE_KEY" },
             { "name": "Content-Type",  "value": "application/json" }
           ]
         },
@@ -104,7 +46,7 @@
       "name": "Query Capacity",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [1340, 300]
+      "position": [680, 300]
     },
     {
       "parameters": {
@@ -116,23 +58,14 @@
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1560, 300]
+      "position": [900, 300]
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [[{ "node": "Fetch All Pages Simple", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Fetch and Upsert Pages", "type": "main", "index": 0 }]]
     },
-    "Fetch All Pages Simple": {
-      "main": [[{ "node": "Shape for Supabase", "type": "main", "index": 0 }]]
-    },
-    "Shape for Supabase": {
-      "main": [[{ "node": "Upsert Tasks", "type": "main", "index": 0 }]]
-    },
-    "Upsert Tasks": {
-      "main": [[{ "node": "Upsert Assignees", "type": "main", "index": 0 }]]
-    },
-    "Upsert Assignees": {
+    "Fetch and Upsert Pages": {
       "main": [[{ "node": "Query Capacity", "type": "main", "index": 0 }]]
     },
     "Query Capacity": {
