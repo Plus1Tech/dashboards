@@ -1,0 +1,91 @@
+{
+  "name": "ConnectWise Capacity Proxy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "cw-capacity",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 240],
+      "webhookId": "cw-capacity-webhook"
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 10 }] }
+      },
+      "id": "a1000001-0000-0000-0000-000000000002",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 420]
+    },
+    {
+      "parameters": {
+        "jsCode": "const SUPABASE_URL  = 'https://pdsvsxzjbkcvychbzqit.supabase.co';\nconst SUPABASE_KEY  = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';\nconst CW_BASE_URL   = 'https://na.myconnectwise.net/v4_6_release/apis/3.0';\nconst CW_AUTH       = 'YOUR_CW_BASIC_AUTH_BASE64';\nconst CW_CLIENT_ID  = 'YOUR_CW_CLIENT_ID';\n\nconst BOARD_MAP = {\n  'Service Ticket': 'service',\n  'New Equipment':  'new_equipment'\n};\n\nconst PAGE_SIZE = 1000;\nlet page = 1;\nlet totalUpserted = 0;\n\nwhile (true) {\n  const tickets = await this.helpers.httpRequest({\n    method: 'GET',\n    url: `${CW_BASE_URL}/service/tickets`,\n    headers: {\n      'Authorization': `Basic ${CW_AUTH}`,\n      'clientId':      CW_CLIENT_ID,\n      'Accept':        'application/json'\n    },\n    qs: {\n      conditions: '(board/name=\"Service Ticket\" OR board/name=\"New Equipment\") AND closedFlag=false',\n      fields:     'id,summary,status/name,priority/name,board/name,owner/id,owner/name',\n      pageSize:   PAGE_SIZE,\n      page\n    }\n  });\n\n  const batch = Array.isArray(tickets) ? tickets : [];\n  if (batch.length === 0) break;\n\n  const rows = batch.map(t => ({\n    id:          t.id,\n    summary:     t.summary    || '',\n    status:      t.status?.name   || 'Unknown',\n    priority:    t.priority?.name || 'Unknown',\n    board:       t.board?.name    || '',\n    ticket_type: BOARD_MAP[t.board?.name] || 'unknown',\n    owner_id:    t.owner?.id   || null,\n    owner_name:  t.owner?.name || null,\n    updated_at:  new Date().toISOString()\n  }));\n\n  await this.helpers.httpRequest({\n    method: 'POST',\n    url:    `${SUPABASE_URL}/rest/v1/cw_tickets`,\n    headers: {\n      'apikey':        SUPABASE_KEY,\n      'Authorization': `Bearer ${SUPABASE_KEY}`,\n      'Content-Type':  'application/json',\n      'Prefer':        'resolution=merge-duplicates'\n    },\n    body: rows,\n    json: true\n  });\n\n  totalUpserted += rows.length;\n  if (batch.length < PAGE_SIZE) break;\n  page++;\n}\n\nreturn [{ json: { totalUpserted } }];"
+      },
+      "id": "a1000001-0000-0000-0000-000000000003",
+      "name": "Fetch and Upsert Pages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pdsvsxzjbkcvychbzqit.supabase.co/rest/v1/rpc/get_cw_capacity",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "YOUR_SUPABASE_SERVICE_ROLE_KEY" },
+            { "name": "Authorization", "value": "Bearer YOUR_SUPABASE_SERVICE_ROLE_KEY" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000004",
+      "name": "Query Capacity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000005",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [980, 240]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Fetch and Upsert Pages", "type": "main", "index": 0 }]]
+    },
+    "Schedule Trigger": {
+      "main": [[{ "node": "Fetch and Upsert Pages", "type": "main", "index": 0 }]]
+    },
+    "Fetch and Upsert Pages": {
+      "main": [[{ "node": "Query Capacity", "type": "main", "index": 0 }]]
+    },
+    "Query Capacity": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "tags": []
+}
